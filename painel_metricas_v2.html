@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Painel de Métricas</title>
+<style>
+  :root{
+    --paper:#F4F4F0;
+    --card:#FFFFFF;
+    --ink:#171715;
+    --ink-2:#5A5A54;
+    --line:#DCDCD4;
+    --rubric:#7A1F2B;
+    --abaixo-c:#A33028;      /* vermelho: abaixo do mínimo */
+    --min-c:#B8860B;         /* amarelo escuro: mínimo */
+    --min-bg:#E8C33C;
+    --ideal-c:#2E5339;       /* verde: ideal */
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--paper);color:var(--ink);font:15px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
+  header{padding:18px 16px 10px;text-align:center}
+  header h1{font-family:"Iowan Old Style",Palatino,"Book Antiqua",Georgia,serif;font-weight:600;font-size:21px;letter-spacing:.2px}
+  header .sub{color:var(--ink-2);font-size:12px;margin-top:2px}
+  .datebar{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 4px}
+  .datebar button{border:1px solid var(--line);background:var(--card);border-radius:8px;width:38px;height:34px;font-size:16px;color:var(--ink)}
+  .datebar .dlabel{font-family:Georgia,serif;font-size:15px;min-width:170px;text-align:center}
+  .wrap{max-width:560px;margin:0 auto;padding:0 12px}
+  .area{margin-top:18px}
+  .area h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rubric);border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:8px;font-weight:700}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .item .info{flex:1;min-width:150px}
+  .item .name{font-weight:600;font-size:14.5px}
+  .item .meta{color:var(--ink-2);font-size:12px;margin-top:1px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
+  .seg button{border:0;background:var(--card);color:var(--ink-2);font-size:12px;font-weight:600;padding:9px 9px;border-left:1px solid var(--line)}
+  .seg button:first-child{border-left:0}
+  .seg button.on-abaixo{background:var(--abaixo-c);color:#fff}
+  .seg button.on-min{background:var(--min-bg);color:var(--ink)}
+  .seg button.on-ideal{background:var(--ideal-c);color:#fff}
+  .counter{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .counter button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:18px;color:var(--ink)}
+  .counter .val{min-width:26px;text-align:center;font-weight:700;font-size:16px}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0}
+  .dot-min{background:var(--min-bg)} .dot-ideal{background:var(--ideal-c)}
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex}
+  nav button{flex:1;padding:13px 0 max(13px, env(safe-area-inset-bottom));background:none;border:0;font-size:13px;font-weight:600;color:var(--ink-2)}
+  nav button.active{color:var(--rubric)}
+  nav button.active .bar{width:26px;height:3px;background:var(--rubric);border-radius:2px;margin:4px auto 0}
+  nav .bar{width:26px;height:3px;background:transparent;margin:4px auto 0}
+  .insight-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+  .big{font-family:Georgia,serif;font-size:32px;font-weight:600;line-height:1}
+  .big small{font-size:13px;color:var(--ink-2);font-family:-apple-system,sans-serif;font-weight:400}
+  .row3{display:flex;gap:8px}
+  .row3 .insight-card{flex:1;padding:11px}
+  .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+  .aviso{border-radius:var(--radius);padding:11px 13px;margin-bottom:8px;font-size:13.5px;font-weight:600;border:1px solid}
+  .aviso.red{background:#F7E7E5;border-color:#E0BDB9;color:var(--abaixo-c)}
+  .aviso.yellow{background:#F7F0DB;border-color:#E4D6A8;color:#7A6210}
+  .aviso.green{background:#E7EFE9;border-color:#C2D6C8;color:var(--ideal-c)}
+  .aviso.gold{background:#F3ECD9;border-color:#DCC98F;color:#6E5A12}
+  .wk-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--paper);font-size:13.5px}
+  .wk-item:last-child{border-bottom:0}
+  .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .tag.ok{background:#F2EAD3;color:#7A6210}
+  .tag.gold{background:#E5EEE7;color:var(--ideal-c)}
+  .tag.miss{background:#F5E4E4;color:var(--abaixo-c)}
+  .tag.zero{background:var(--paper);color:var(--ink-2)}
+  .daychips{display:flex;gap:5px;margin-top:8px}
+  .chip{flex:1;text-align:center;font-size:10px;color:var(--ink-2)}
+  .chip .box{height:26px;border:1px solid var(--line);border-radius:6px;margin-bottom:3px;background:var(--paper)}
+  .gridrow{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--paper)}
+  .gridrow:last-child{border-bottom:0}
+  .gridrow .gname{flex:1;font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cells{display:flex;gap:3px;flex-shrink:0}
+  .cell{width:16px;height:16px;border-radius:4px;border:1px solid var(--line);background:var(--paper)}
+  .cell.red{background:var(--abaixo-c);border-color:var(--abaixo-c)}
+  .cell.yellow{background:var(--min-bg);border-color:var(--min-bg)}
+  .cell.green{background:var(--ideal-c);border-color:var(--ideal-c)}
+  .legend{display:flex;gap:12px;justify-content:center;font-size:11px;color:var(--ink-2);margin:8px 0 2px}
+  .legend span{display:flex;align-items:center;gap:4px}
+  .legend .cell{width:12px;height:12px}
+  .modebar{display:flex;justify-content:center;gap:0;margin:8px 0}
+  .modebar button{border:1px solid var(--line);background:var(--card);padding:8px 18px;font-size:13px;font-weight:600;color:var(--ink-2)}
+  .modebar button:first-child{border-radius:8px 0 0 8px}
+  .modebar button:last-child{border-radius:0 8px 8px 0;border-left:0}
+  .modebar button.on{background:var(--rubric);border-color:var(--rubric);color:#fff}
+  .note{color:var(--ink-2);font-size:12px;text-align:center;margin:14px 0}
+  .hidden{display:none}
+  .backup{display:flex;gap:8px;justify-content:center;margin:16px 0}
+  .backup button,.backup label{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+  .backup input{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Painel de Métricas</h1>
+  <div class="sub">Piso inquebrável · Alvo de cruzeiro</div>
+</header>
+
+<div class="wrap">
+  <div id="view-dia">
+    <div class="datebar">
+      <button onclick="mudarDia(-1)">‹</button>
+      <div class="dlabel" id="dlabel"></div>
+      <button onclick="mudarDia(1)">›</button>
+    </div>
+    <div id="lista-dia"></div>
+    <div class="note">Abaixo = vermelho · Mín = amarelo · Ideal = verde. Tocar de novo desmarca.</div>
+  </div>
+
+  <div id="view-sem" class="hidden">
+    <div class="datebar">
+      <button onclick="mudarSemana(-1)">‹</button>
+      <div class="dlabel" id="wlabel"></div>
+      <button onclick="mudarSemana(1)">›</button>
+    </div>
+    <div id="lista-sem"></div>
+    <div class="note">Preencher no domingo, na revisão semanal: registre quantas vezes fez cada item na semana.</div>
+  </div>
+
+  <div id="view-ins" class="hidden">
+    <div class="modebar">
+      <button id="mb-sem" class="on" onclick="modo('sem')">Semanal</button>
+      <button id="mb-mes" onclick="modo('mes')">Mensal</button>
+    </div>
+    <div class="datebar">
+      <button onclick="mudarIns(-1)">‹</button>
+      <div class="dlabel" id="ilabel"></div>
+      <button onclick="mudarIns(1)">›</button>
+    </div>
+    <div id="painel-ins"></div>
+    <div class="backup">
+      <button onclick="exportar()">Exportar backup</button>
+      <label>Importar backup<input type="file" accept=".json" onchange="importar(event)"></label>
+    </div>
+    <div class="note">Exporte no domingo, junto com a revisão semanal. O arquivo baixado é o seu backup.</div>
+  </div>
+</div>
+
+<nav>
+  <button id="nb-dia" class="active" onclick="tab('dia')">Diário<div class="bar"></div></button>
+  <button id="nb-sem" onclick="tab('sem')">Semanal<div class="bar"></div></button>
+  <button id="nb-ins" onclick="tab('ins')">Insights<div class="bar"></div></button>
+</nav>
+
+<script>
+/* ------- métricas ------- */
+const DIARIAS=[
+ {id:'terco',n:'Terço',a:'Espiritual',min:'1x',ideal:'1x'},
+ {id:'rezas',n:'Rezas do dia',a:'Espiritual',min:'algumas',ideal:'todas'},
+ {id:'exame',n:'Exame de consciência',a:'Espiritual',min:'1x',ideal:'1x'},
+ {id:'olavo',n:'Artigo do Olavo',a:'Intelectual',min:'1x',ideal:'2x'},
+ {id:'leitura',n:'Leitura',a:'Intelectual',min:'1,5h',ideal:'3h'},
+ {id:'trabalho',n:'Tempo de trabalho',a:'Financeiro',min:'3h',ideal:'5h'},
+ {id:'creatina',n:'Creatina 10 g',a:'Físico',min:'1x',ideal:'1x'},
+ {id:'beta',n:'Beta-alanina 6 g',a:'Físico',min:'1 dose de 6 g',ideal:'3 doses de 2 g'},
+ {id:'multi',n:'Multivitamínico',a:'Físico',min:'1',ideal:'2'},
+ {id:'mela',n:'Melatonina',a:'Físico',teto:true,min:'0 mg',ideal:'máx 1 mg'},
+ {id:'minox',n:'Minoxidil 0,5 ml',a:'Físico',min:'1x',ideal:'2x'},
+ {id:'dentes',n:'Escovar os dentes',a:'Físico',min:'2x',ideal:'após cada refeição'},
+ {id:'fruta',n:'Fruta e vegetais',a:'Físico',min:'um pouco dos dois',ideal:'300 g + 300 g'},
+ {id:'agua',n:'Água',a:'Físico',min:'2,5 L',ideal:'4,5 L'},
+ {id:'along',n:'Alongamento',a:'Físico',min:'1x',ideal:'1x'},
+ {id:'grip',n:'Handgrip',a:'Físico',min:'1x',ideal:'1x'},
+ {id:'protetor',n:'Protetor solar',a:'Físico',min:'1x',ideal:'3x'},
+ {id:'sabonete',n:'Sabonete facial',a:'Físico',min:'1x',ideal:'1x'},
+ {id:'creme',n:'Creme noite',a:'Físico',min:'1x',ideal:'1x'},
+ {id:'sol',n:'Tomar sol',a:'Físico',min:'10 min',ideal:'30 min'},
+ {id:'visual',n:'Visualizar objetivos e moti',a:'Pessoal',min:'1x',ideal:'—'},
+ {id:'gingado',n:'Curso Destrave seu Gingado',a:'Pessoal',min:'1x',ideal:'1x'}
+];
+const SEMANAIS=[
+ {id:'missa',n:'Missa',a:'Espiritual',min:1,ideal:1},
+ {id:'confissao',n:'Confissão',a:'Espiritual',min:1,ideal:1},
+ {id:'cof',n:'COF',a:'Intelectual',min:1,ideal:2},
+ {id:'mat',n:'Matemática',a:'Intelectual',min:3,ideal:7},
+ {id:'poema',n:'Poema — decorar',a:'Intelectual',min:2,ideal:5},
+ {id:'logico',n:'Treino lógico',a:'Intelectual',min:2,ideal:4},
+ {id:'ingcurso',n:'Inglês — curso',a:'Intelectual',min:3,ideal:5},
+ {id:'ingconv',n:'Inglês — conversação',a:'Intelectual',min:1,ideal:2},
+ {id:'revisao',n:'Revisão',a:'Intelectual',min:1,ideal:7},
+ {id:'swiper',n:'Ler Swiper',a:'Financeiro',min:2,ideal:7},
+ {id:'musc',n:'Musculação',a:'Físico',min:2,ideal:4},
+ {id:'grupo',n:'Cada grupo muscular',a:'Físico',min:1,ideal:null,idealTxt:'protocolo'},
+ {id:'jiu',n:'Jiu-jitsu',a:'Físico',min:3,ideal:7},
+ {id:'lutape',n:'Luta em pé',a:'Físico',min:2,ideal:4},
+ {id:'sparring',n:'Sparring',a:'Físico',min:1,ideal:2},
+ {id:'corrida',n:'Corrida rápida',a:'Físico',min:2,ideal:4},
+ {id:'meia',n:'21 km',a:'Físico',min:0,ideal:1}
+];
+const AREAS=['Espiritual','Intelectual','Financeiro','Físico','Pessoal'];
+const PREFIX='painel-metricas:';
+
+/* ------- estado ------- */
+let hoje=new Date(); let diaSel=fmt(hoje);
+let semSel=segunda(hoje);
+let insModo='sem'; let insSem=segunda(hoje); let insMes=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1));
+
+function fmt(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
+function segunda(d){const x=new Date(d);const g=(x.getDay()+6)%7;x.setDate(x.getDate()-g);return fmt(x)}
+function addDias(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return fmt(d)}
+function labelDia(iso){const d=new Date(iso+'T12:00:00');const w=['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()];return w+', '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()}
+function labelSem(iso){const f=addDias(iso,6);const a=new Date(iso+'T12:00:00'),b=new Date(f+'T12:00:00');return a.getDate()+'/'+(a.getMonth()+1)+' a '+b.getDate()+'/'+(b.getMonth()+1)}
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function labelMes(iso){const d=new Date(iso+'T12:00:00');return MESES[d.getMonth()]+' de '+d.getFullYear()}
+
+/* ------- storage ------- */
+function getKey(k){try{const r=localStorage.getItem(PREFIX+k);return r?JSON.parse(r):{}}catch(e){return{}}}
+function setKey(k,v){try{localStorage.setItem(PREFIX+k,JSON.stringify(v))}catch(e){alert('Falha ao salvar. Verifique o espaço do navegador.')}}
+function loadDia(iso){return getKey('dia:'+iso)}
+function saveDia(iso,d){setKey('dia:'+iso,d)}
+function loadSem(iso){return getKey('sem:'+iso)}
+function saveSem(iso,d){setKey('sem:'+iso,d)}
+
+/* ------- classificação de estado ------- */
+/* retorna: 'abaixo' | 'min' | 'ideal' | null */
+function classifica(m,st){
+ if(m.teto){if(st==='ok')return 'ideal'; if(st==='estourou')return 'abaixo'; return null}
+ if(m.ideal==='—'){if(st==='min')return 'ideal'; if(st==='abaixo')return 'abaixo'; return null}
+ if(st==='ideal')return 'ideal'; if(st==='min')return 'min'; if(st==='abaixo')return 'abaixo'; return null
+}
+
+/* ------- visão diária ------- */
+function renderDia(){
+ document.getElementById('dlabel').textContent=labelDia(diaSel);
+ const dados=loadDia(diaSel);
+ let html='';
+ for(const a of AREAS){
+   const itens=DIARIAS.filter(m=>m.a===a); if(!itens.length)continue;
+   html+='<div class="area"><h2>'+a+'</h2>';
+   for(const m of itens){
+     const st=dados[m.id]||null;
+     html+='<div class="item"><div class="info"><div class="name">'+m.n+'</div><div class="meta">'+
+       (m.teto?('Teto: '+m.ideal):('Mín: '+m.min+(m.ideal!=='—'?' · Ideal: '+m.ideal:'')))+'</div></div>';
+     if(m.teto){
+       html+='<div class="seg">'+
+        '<button class="'+(st==='estourou'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'estourou\')">Estourou</button>'+
+        '<button class="'+(st==='ok'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ok\')">Dentro</button></div>';
+     }else if(m.ideal==='—'){
+       html+='<div class="seg">'+
+        '<button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button>'+
+        '<button class="'+(st==='min'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Feito</button></div>';
+     }else{
+       html+='<div class="seg">'+
+        '<button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button>'+
+        '<button class="'+(st==='min'?'on-min':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Mín</button>'+
+        '<button class="'+(st==='ideal'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ideal\')">Ideal</button></div>';
+     }
+     html+='</div>';
+   }
+   html+='</div>';
+ }
+ document.getElementById('lista-dia').innerHTML=html;
+}
+function marca(id,val){
+ const d=loadDia(diaSel);
+ d[id]=(d[id]===val)?null:val;
+ saveDia(diaSel,d); renderDia();
+}
+function mudarDia(n){diaSel=addDias(diaSel,n);renderDia()}
+
+/* ------- visão semanal ------- */
+function renderSem(){
+ document.getElementById('wlabel').textContent='Semana '+labelSem(semSel);
+ const dados=loadSem(semSel);
+ let html='';
+ for(const a of AREAS){
+   const itens=SEMANAIS.filter(m=>m.a===a); if(!itens.length)continue;
+   html+='<div class="area"><h2>'+a+'</h2>';
+   for(const m of itens){
+     const v=dados[m.id]||0;
+     const hitIdeal=m.ideal!=null&&v>=m.ideal;
+     const dot=hitIdeal?'dot-ideal':(v>=m.min&&m.min>0?'dot-min':'');
+     html+='<div class="item"><div class="status-dot '+dot+'"></div><div class="info"><div class="name">'+m.n+'</div>'+
+      '<div class="meta">Mín: '+m.min+'x · Ideal: '+(m.ideal!=null?m.ideal+'x':m.idealTxt)+'</div></div>'+
+      '<div class="counter"><button onclick="conta(\''+m.id+'\',-1)">−</button><div class="val">'+v+'</div><button onclick="conta(\''+m.id+'\',1)">+</button></div></div>';
+   }
+   html+='</div>';
+ }
+ document.getElementById('lista-sem').innerHTML=html;
+}
+function conta(id,n){
+ const d=loadSem(semSel);
+ d[id]=Math.max(0,(d[id]||0)+n);
+ saveSem(semSel,d); renderSem();
+}
+function mudarSemana(n){semSel=addDias(semSel,7*n);renderSem()}
+
+/* ------- agregadores ------- */
+function statsDias(dias){
+ const hojeIso=fmt(new Date());
+ let ab=0,mi=0,idl=0,tot=0;
+ const porMetrica={}; DIARIAS.forEach(m=>porMetrica[m.id]={ab:0,mi:0,idl:0,vazio:0,dias:[]});
+ let diasContados=0;
+ for(const d of dias){
+   if(d>hojeIso){DIARIAS.forEach(m=>porMetrica[m.id].dias.push('futuro'));continue}
+   diasContados++;
+   const dd=loadDia(d);
+   for(const m of DIARIAS){
+     const c=classifica(m,dd[m.id]);
+     tot++;
+     if(c==='abaixo'){ab++;porMetrica[m.id].ab++;porMetrica[m.id].dias.push('red')}
+     else if(c==='min'){mi++;porMetrica[m.id].mi++;porMetrica[m.id].dias.push('yellow')}
+     else if(c==='ideal'){idl++;porMetrica[m.id].idl++;porMetrica[m.id].dias.push('green')}
+     else{porMetrica[m.id].vazio++;porMetrica[m.id].dias.push('vazio')}
+   }
+ }
+ return {ab,mi,idl,tot,porMetrica,diasContados,
+   pctAb:tot?Math.round(ab/tot*100):0,
+   pctPiso:tot?Math.round((mi+idl)/tot*100):0,
+   pctIdeal:tot?Math.round(idl/tot*100):0};
+}
+function pisoDoDia(iso){
+ const dd=loadDia(iso); let h=0;
+ for(const m of DIARIAS){const c=classifica(m,dd[m.id]);if(c==='min'||c==='ideal')h++}
+ return Math.round(h/DIARIAS.length*100);
+}
+function semanaCompleta(iso){return addDias(iso,6)<fmt(new Date())}
+function idealDaSemana(iso){
+ const dias=[...Array(7)].map((_,i)=>addDias(iso,i));
+ const s=statsDias(dias); return s.pctIdeal;
+}
+
+/* ------- avisos ------- */
+function gerarAvisos(s,escopo,semanaIso){
+ const av=[];
+ if(s.tot===0){av.push(['yellow','Sem registros neste período ainda.']);return av}
+ if(s.pctAb>=30)av.push(['red','Atenção: '+s.pctAb+'% dos itens ficaram abaixo do mínimo n'+(escopo==='sem'?'a semana':'o mês')+'. O piso pede correção no dia seguinte, sem veredito.']);
+ else if(s.pctAb>=15)av.push(['red',s.pctAb+'% abaixo do mínimo. Vigiar antes que vire padrão.']);
+ if(s.pctIdeal>=100){
+   av.push(['gold','100% no ideal. Período masterizado.']);
+   if(escopo==='sem'&&semanaIso){
+     const s1=addDias(semanaIso,-7), s2=addDias(semanaIso,-14);
+     if(semanaCompleta(s1)&&semanaCompleta(s2)&&idealDaSemana(s1)>=100&&idealDaSemana(s2)>=100){
+       av.push(['gold','Três semanas seguidas com 100% de ideal. Você está indo muito bem: constância no nível máximo.']);
+     }
+   }
+ }
+ else if(s.pctIdeal>=80)av.push(['green','Muito bem: '+s.pctIdeal+'% no ideal. Quase masterizado.']);
+ else if(s.pctPiso>=80)av.push(['green','Piso sustentado: '+s.pctPiso+'% dos itens no mínimo ou acima. Constância acima de intensidade.']);
+ else if(s.pctPiso>=60)av.push(['yellow','Piso em '+s.pctPiso+'%. Firmar o mínimo antes de mirar o ideal.']);
+ else av.push(['yellow','Piso em '+s.pctPiso+'%. Voltar ao começo pequeno inquebrável.']);
+ return av;
+}
+
+/* ------- insights ------- */
+function renderIns(){
+ if(insModo==='sem')renderInsSem(); else renderInsMes();
+}
+function renderInsSem(){
+ document.getElementById('ilabel').textContent='Semana '+labelSem(insSem);
+ const dias=[...Array(7)].map((_,i)=>addDias(insSem,i));
+ const s=statsDias(dias);
+ const hojeIso=fmt(new Date());
+ const nomes=['S','T','Q','Q','S','S','D'];
+ const chips=dias.map((d,i)=>{
+   if(d>hojeIso)return '<div class="chip"><div class="box" style="background:transparent"></div>'+nomes[i]+'</div>';
+   const p=pisoDoDia(d);
+   const cor=p>=100?'var(--ideal-c)':p>=60?'var(--min-bg)':p>0?'var(--abaixo-c)':'var(--paper)';
+   return '<div class="chip"><div class="box" style="background:'+cor+'"></div>'+nomes[i]+'<br>'+p+'%</div>';
+ }).join('');
+
+ let grade='';
+ for(const m of DIARIAS){
+   const pm=s.porMetrica[m.id];
+   const cells=pm.dias.map(c=>'<div class="cell '+(c==='red'?'red':c==='yellow'?'yellow':c==='green'?'green':'')+'"></div>').join('');
+   grade+='<div class="gridrow"><div class="gname">'+m.n+'</div><div class="cells">'+cells+'</div></div>';
+ }
+
+ const ws=loadSem(insSem);
+ let wHitMin=0,wTot=0,wLista='';
+ for(const m of SEMANAIS){
+   const v=ws[m.id]||0;
+   const okMin=v>=m.min, okIdeal=m.ideal!=null&&v>=m.ideal;
+   if(m.min>0){wTot++;if(okMin)wHitMin++}
+   let tag;
+   if(okIdeal)tag='<span class="tag gold">ideal</span>';
+   else if(okMin&&m.min>0)tag='<span class="tag ok">mín ok</span>';
+   else if(m.min===0)tag='<span class="tag zero">'+v+'x</span>';
+   else tag='<span class="tag miss">'+v+' de '+m.min+'</span>';
+   wLista+='<div class="wk-item"><span>'+m.n+'</span>'+tag+'</div>';
+ }
+ const wPct=wTot?Math.round(wHitMin/wTot*100):0;
+ const avisos=gerarAvisos(s,'sem',insSem).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
+
+ document.getElementById('painel-ins').innerHTML=
+  avisos+
+  '<div class="row3">'+
+   '<div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+s.pctAb+'<small>%</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+s.pctPiso+'<small>%</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+s.pctIdeal+'<small>%</small></div></div>'+
+  '</div>'+
+  '<div class="insight-card"><div class="lbl">Dias da semana — % do piso</div><div class="daychips">'+chips+'</div></div>'+
+  '<div class="insight-card"><div class="lbl">Desempenho da semana — item a item</div>'+
+   '<div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span><span><div class="cell"></div>sem marca</span></div>'+
+   grade+'</div>'+
+  '<div class="insight-card"><div class="lbl">Semanais — pisos batidos</div><div class="big">'+wHitMin+'<small> de '+wTot+' ('+wPct+'%)</small></div><div style="color:var(--ink-2);font-size:12px;margin-top:4px">Semanais são preenchidas no domingo; antes disso este número fica incompleto.</div></div>'+
+  '<div class="insight-card"><div class="lbl">Detalhe semanal</div>'+wLista+'</div>'+
+  '<div class="note">Falhar o alvo não é falhar. Falhar o piso pede correção amanhã, sem veredito.</div>';
+}
+function renderInsMes(){
+ document.getElementById('ilabel').textContent=labelMes(insMes);
+ const d0=new Date(insMes+'T12:00:00');
+ const nDias=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate();
+ const dias=[...Array(nDias)].map((_,i)=>addDias(insMes,i));
+ const s=statsDias(dias);
+
+ let grade='';
+ for(const m of DIARIAS){
+   const pm=s.porMetrica[m.id];
+   grade+='<div class="wk-item"><span>'+m.n+'</span><span style="display:flex;gap:6px">'+
+    '<span class="tag miss">'+pm.ab+'</span><span class="tag ok">'+pm.mi+'</span><span class="tag gold">'+pm.idl+'</span></span></div>';
+ }
+
+ const segundas=[];
+ let seg1=segunda(new Date(insMes+'T12:00:00'));
+ if(seg1<insMes)seg1=addDias(seg1,7);
+ for(let s2=seg1;s2<=dias[nDias-1];s2=addDias(s2,7))segundas.push(s2);
+ let wHit=0,wTot=0;
+ for(const w of segundas){
+   const ws=loadSem(w);
+   for(const m of SEMANAIS){if(m.min>0){wTot++;if((ws[m.id]||0)>=m.min)wHit++}}
+ }
+ const wPct=wTot?Math.round(wHit/wTot*100):0;
+ const avisos=gerarAvisos(s,'mes',null).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
+
+ document.getElementById('painel-ins').innerHTML=
+  avisos+
+  '<div class="row3">'+
+   '<div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+s.pctAb+'<small>%</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+s.pctPiso+'<small>%</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+s.pctIdeal+'<small>%</small></div></div>'+
+  '</div>'+
+  '<div class="insight-card"><div class="lbl">Mês — item a item (abaixo · mínimo · ideal, em dias)</div>'+
+   '<div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span></div>'+
+   grade+'</div>'+
+  '<div class="insight-card"><div class="lbl">Semanais do mês — pisos batidos</div><div class="big">'+wHit+'<small> de '+wTot+' ('+wPct+'%)</small></div></div>'+
+  '<div class="note">Falhar o alvo não é falhar. Falhar o piso pede correção amanhã, sem veredito.</div>';
+}
+function modo(m){
+ insModo=m;
+ document.getElementById('mb-sem').classList.toggle('on',m==='sem');
+ document.getElementById('mb-mes').classList.toggle('on',m==='mes');
+ renderIns();
+}
+function mudarIns(n){
+ if(insModo==='sem')insSem=addDias(insSem,7*n);
+ else{const d=new Date(insMes+'T12:00:00');d.setMonth(d.getMonth()+n);insMes=fmt(new Date(d.getFullYear(),d.getMonth(),1))}
+ renderIns();
+}
+
+/* ------- backup ------- */
+function exportar(){
+ const dump={};
+ for(let i=0;i<localStorage.length;i++){
+   const k=localStorage.key(i);
+   if(k&&k.startsWith(PREFIX))dump[k]=localStorage.getItem(k);
+ }
+ const blob=new Blob([JSON.stringify(dump,null,1)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='painel-metricas-backup-'+fmt(new Date())+'.json';
+ a.click();
+ URL.revokeObjectURL(a.href);
+}
+function importar(ev){
+ const f=ev.target.files[0]; if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{
+   try{
+     const dump=JSON.parse(r.result);
+     let n=0;
+     for(const k in dump){if(k.startsWith(PREFIX)){localStorage.setItem(k,dump[k]);n++}}
+     alert('Backup importado: '+n+' registros.');
+     renderDia();renderSem();renderIns();
+   }catch(e){alert('Arquivo inválido.')}
+ };
+ r.readAsText(f);
+ ev.target.value='';
+}
+
+/* ------- navegação ------- */
+function tab(t){
+ for(const v of['dia','sem','ins']){
+   document.getElementById('view-'+v).classList.toggle('hidden',v!==t);
+   document.getElementById('nb-'+v).classList.toggle('active',v===t);
+ }
+ if(t==='dia')renderDia(); if(t==='sem')renderSem(); if(t==='ins')renderIns();
+}
+renderDia();
+</script>
+</body>
+</html>
