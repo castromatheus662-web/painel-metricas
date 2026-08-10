@@ -16,6 +16,7 @@
     --min-c:#B8860B;         /* amarelo escuro: mínimo */
     --min-bg:#E8C33C;
     --ideal-c:#2E5339;       /* verde: ideal */
+    --nh-c:#8A8A82;          /* cinza: não houve ocasião */
     --radius:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -29,6 +30,7 @@
   .wrap{max-width:560px;margin:0 auto;padding:0 12px}
   .area{margin-top:18px}
   .area h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rubric);border-bottom:1px solid var(--line);padding-bottom:5px;margin-bottom:8px;font-weight:700}
+  .area .sub2{color:var(--ink-2);font-size:12px;margin:-4px 0 8px}
   .item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .item .info{flex:1;min-width:150px}
   .item .name{font-weight:600;font-size:14.5px}
@@ -39,13 +41,14 @@
   .seg button.on-abaixo{background:var(--abaixo-c);color:#fff}
   .seg button.on-min{background:var(--min-bg);color:var(--ink)}
   .seg button.on-ideal{background:var(--ideal-c);color:#fff}
+  .seg button.on-nh{background:var(--nh-c);color:#fff}
   .counter{display:flex;align-items:center;gap:8px;flex-shrink:0}
   .counter button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:18px;color:var(--ink)}
   .counter .val{min-width:26px;text-align:center;font-weight:700;font-size:16px}
   .status-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0}
   .dot-min{background:var(--min-bg)} .dot-ideal{background:var(--ideal-c)}
   nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex}
-  nav button{flex:1;padding:13px 0 max(13px, env(safe-area-inset-bottom));background:none;border:0;font-size:13px;font-weight:600;color:var(--ink-2)}
+  nav button{flex:1;padding:13px 0 max(13px, env(safe-area-inset-bottom));background:none;border:0;font-size:12.5px;font-weight:600;color:var(--ink-2)}
   nav button.active{color:var(--rubric)}
   nav button.active .bar{width:26px;height:3px;background:var(--rubric);border-radius:2px;margin:4px auto 0}
   nav .bar{width:26px;height:3px;background:transparent;margin:4px auto 0}
@@ -60,13 +63,15 @@
   .aviso.yellow{background:#F7F0DB;border-color:#E4D6A8;color:#7A6210}
   .aviso.green{background:#E7EFE9;border-color:#C2D6C8;color:var(--ideal-c)}
   .aviso.gold{background:#F3ECD9;border-color:#DCC98F;color:#6E5A12}
-  .wk-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--paper);font-size:13.5px}
+  .wk-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--paper);font-size:13.5px}
   .wk-item:last-child{border-bottom:0}
-  .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .wk-item .txt{flex:1;min-width:0}
+  .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
   .tag.ok{background:#F2EAD3;color:#7A6210}
   .tag.gold{background:#E5EEE7;color:var(--ideal-c)}
   .tag.miss{background:#F5E4E4;color:var(--abaixo-c)}
   .tag.zero{background:var(--paper);color:var(--ink-2)}
+  .tag.nh{background:#ECECE7;color:var(--nh-c)}
   .daychips{display:flex;gap:5px;margin-top:8px}
   .chip{flex:1;text-align:center;font-size:10px;color:var(--ink-2)}
   .chip .box{height:26px;border:1px solid var(--line);border-radius:6px;margin-bottom:3px;background:var(--paper)}
@@ -78,19 +83,33 @@
   .cell.red{background:var(--abaixo-c);border-color:var(--abaixo-c)}
   .cell.yellow{background:var(--min-bg);border-color:var(--min-bg)}
   .cell.green{background:var(--ideal-c);border-color:var(--ideal-c)}
-  .legend{display:flex;gap:12px;justify-content:center;font-size:11px;color:var(--ink-2);margin:8px 0 2px}
+  .cell.grey{background:var(--nh-c);border-color:var(--nh-c)}
+  .legend{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin:8px 0 2px}
   .legend span{display:flex;align-items:center;gap:4px}
   .legend .cell{width:12px;height:12px}
   .modebar{display:flex;justify-content:center;gap:0;margin:8px 0}
-  .modebar button{border:1px solid var(--line);background:var(--card);padding:8px 18px;font-size:13px;font-weight:600;color:var(--ink-2)}
+  .modebar button{border:1px solid var(--line);background:var(--card);padding:8px 14px;font-size:13px;font-weight:600;color:var(--ink-2)}
   .modebar button:first-child{border-radius:8px 0 0 8px}
-  .modebar button:last-child{border-radius:0 8px 8px 0;border-left:0}
+  .modebar button+button{border-left:0}
+  .modebar button:last-child{border-radius:0 8px 8px 0}
   .modebar button.on{background:var(--rubric);border-color:var(--rubric);color:#fff}
   .note{color:var(--ink-2);font-size:12px;text-align:center;margin:14px 0}
   .hidden{display:none}
   .backup{display:flex;gap:8px;justify-content:center;margin:16px 0}
   .backup button,.backup label{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
   .backup input{display:none}
+  /* exame */
+  .ex-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px}
+  .ex-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .ex-q{flex:1;min-width:150px;font-size:14px;line-height:1.35}
+  .ex-nota{background:#F3ECD9;border:1px solid #DCC98F;color:#5C4B10;border-radius:var(--radius);padding:11px 13px;margin-bottom:8px;font-size:12.5px;line-height:1.5}
+  .ex-txt{width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;font:14px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);min-height:76px;margin-bottom:8px;resize:vertical}
+  .ex-txt::placeholder{color:var(--ink-2)}
+  .imput{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--paper);align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .imput.show{display:flex}
+  .imput .q{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .cof-num{color:var(--rubric);font-weight:700;font-size:12px;margin-right:6px}
+  .cof-se{display:block;color:var(--ink-2);font-size:12.5px;margin-top:3px}
 </style>
 </head>
 <body>
@@ -120,10 +139,21 @@
     <div class="note">Preencher no domingo, na revisão semanal: registre quantas vezes fez cada item na semana.</div>
   </div>
 
+  <div id="view-exa" class="hidden">
+    <div class="datebar">
+      <button onclick="mudarExame(-1)">‹</button>
+      <div class="dlabel" id="elabel"></div>
+      <button onclick="mudarExame(1)">›</button>
+    </div>
+    <div id="lista-exa"></div>
+    <div class="note">Noite, 8 a 10 minutos. Verdade diante de Deus: sem desculpa, sem desespero. Um defeito-raiz de cada vez.</div>
+  </div>
+
   <div id="view-ins" class="hidden">
     <div class="modebar">
       <button id="mb-sem" class="on" onclick="modo('sem')">Semanal</button>
       <button id="mb-mes" onclick="modo('mes')">Mensal</button>
+      <button id="mb-exa" onclick="modo('exa')">Exame</button>
     </div>
     <div class="datebar">
       <button onclick="mudarIns(-1)">‹</button>
@@ -142,18 +172,20 @@
 <nav>
   <button id="nb-dia" class="active" onclick="tab('dia')">Diário<div class="bar"></div></button>
   <button id="nb-sem" onclick="tab('sem')">Semanal<div class="bar"></div></button>
+  <button id="nb-exa" onclick="tab('exa')">Exame<div class="bar"></div></button>
   <button id="nb-ins" onclick="tab('ins')">Insights<div class="bar"></div></button>
 </nav>
 
 <script>
-/* ------- métricas ------- */
+/* ==================================================================
+   1. MÉTRICAS DIÁRIAS
+   ================================================================== */
 const DIARIAS=[
  {id:'terco',n:'Terço',a:'Espiritual',min:'1x',ideal:'1x'},
  {id:'rezas',n:'Rezas do dia',a:'Espiritual',min:'algumas',ideal:'todas'},
  {id:'exame',n:'Exame de consciência',a:'Espiritual',min:'1x',ideal:'1x'},
- {id:'olavo',n:'Artigo do Olavo',a:'Intelectual',min:'1x',ideal:'2x'},
  {id:'leitura',n:'Leitura',a:'Intelectual',min:'1,5h',ideal:'3h'},
- {id:'trabalho',n:'Tempo de trabalho',a:'Financeiro',min:'3h',ideal:'5h'},
+ {id:'trabalho',n:'Tempo de trabalho',a:'Financeiro',min:'1h',ideal:'5h'},
  {id:'creatina',n:'Creatina 10 g',a:'Físico',min:'1x',ideal:'1x'},
  {id:'beta',n:'Beta-alanina 6 g',a:'Físico',min:'1 dose de 6 g',ideal:'3 doses de 2 g'},
  {id:'multi',n:'Multivitamínico',a:'Físico',min:'1',ideal:'2'},
@@ -167,36 +199,159 @@ const DIARIAS=[
  {id:'protetor',n:'Protetor solar',a:'Físico',min:'1x',ideal:'3x'},
  {id:'sabonete',n:'Sabonete facial',a:'Físico',min:'1x',ideal:'1x'},
  {id:'creme',n:'Creme noite',a:'Físico',min:'1x',ideal:'1x'},
- {id:'sol',n:'Tomar sol',a:'Físico',min:'10 min',ideal:'30 min'},
  {id:'visual',n:'Visualizar objetivos e moti',a:'Pessoal',min:'1x',ideal:'—'},
  {id:'gingado',n:'Curso Destrave seu Gingado',a:'Pessoal',min:'1x',ideal:'1x'}
 ];
+
+/* ==================================================================
+   2. MÉTRICAS SEMANAIS
+   ================================================================== */
 const SEMANAIS=[
  {id:'missa',n:'Missa',a:'Espiritual',min:1,ideal:1},
- {id:'confissao',n:'Confissão',a:'Espiritual',min:1,ideal:1},
  {id:'cof',n:'COF',a:'Intelectual',min:1,ideal:2},
- {id:'mat',n:'Matemática',a:'Intelectual',min:3,ideal:7},
- {id:'poema',n:'Poema — decorar',a:'Intelectual',min:2,ideal:5},
- {id:'logico',n:'Treino lógico',a:'Intelectual',min:2,ideal:4},
  {id:'ingcurso',n:'Inglês — curso',a:'Intelectual',min:3,ideal:5},
- {id:'ingconv',n:'Inglês — conversação',a:'Intelectual',min:1,ideal:2},
- {id:'revisao',n:'Revisão',a:'Intelectual',min:1,ideal:7},
- {id:'swiper',n:'Ler Swiper',a:'Financeiro',min:2,ideal:7},
  {id:'musc',n:'Musculação',a:'Físico',min:2,ideal:4},
- {id:'grupo',n:'Cada grupo muscular',a:'Físico',min:1,ideal:null,idealTxt:'protocolo'},
- {id:'jiu',n:'Jiu-jitsu',a:'Físico',min:3,ideal:7},
+ {id:'calistenia',n:'Calistenia',a:'Físico',min:2,ideal:4},
+ {id:'jiu',n:'Jiu-jitsu',a:'Físico',min:2,ideal:4},
  {id:'lutape',n:'Luta em pé',a:'Físico',min:2,ideal:4},
- {id:'sparring',n:'Sparring',a:'Físico',min:1,ideal:2},
- {id:'corrida',n:'Corrida rápida',a:'Físico',min:2,ideal:4},
+ {id:'sparring',n:'Sparring',a:'Físico',min:1,ideal:1},
  {id:'meia',n:'21 km',a:'Físico',min:0,ideal:1}
 ];
 const AREAS=['Espiritual','Intelectual','Financeiro','Físico','Pessoal'];
 const PREFIX='painel-metricas:';
 
+/* ==================================================================
+   3. EXAME DE CONSCIENCIA
+   Respostas: 'sim' | 'nao' | 'nh' (nao houve ocasiao).
+   nh:true libera o terceiro botao. Sem nh, so Sim/Nao.
+   inv:true inverte a polaridade: nesse item, Nao e a resposta fiel.
+   Item nao respondido NAO conta como falta.
+   ================================================================== */
+const EXAME=[
+ {id:'ancoras',t:'1 \u00b7 \u00c2ncoras do dia',sub:'N\u00e3o negoci\u00e1veis. Se algo aqui falhou, \u00e9 o prop\u00f3sito priorit\u00e1rio de amanh\u00e3.',itens:[
+   {id:'a1',q:'Acordei \u00e0s 05:15, sem pegar o celular?'},
+   {id:'a2',q:'Cumpri a reza da manh\u00e3 (Ter\u00e7o do dia, rezas do dia, medita\u00e7\u00e3o)?'},
+   {id:'a6',q:'Visualizei os objetivos e o moti do dia?'},
+   {id:'a3',q:'Mantive fechado o canal de contato com a ocasi\u00e3o pr\u00f3xima (notifica\u00e7\u00f5es, Discord)?'},
+   {id:'a4',q:'Treinei ou cumpri o m\u00ednimo f\u00edsico do dia?'},
+   {id:'a5',q:'Fui transparente hoje, sem omiss\u00e3o relevante com minha m\u00e3e ou comigo mesmo?'}
+ ]},
+ {id:'revisao',t:'2 \u00b7 Revis\u00e3o r\u00e1pida do dia',
+   nota:'Percorra o dia em quatro blocos: manh\u00e3, tarde, noite, rela\u00e7\u00f5es. Onde fui fiel ao dever? Onde me perdi? Sem escrever: s\u00f3 percorrer, e levar o que aparecer para as se\u00e7\u00f5es abaixo.'},
+ {id:'dever',t:'3.1 \u00b7 Dever de estado',sub:'Trabalho, estudo, ac\u00eddia.',itens:[
+   {id:'d1',q:'Cumpri o dever do dia (faculdade, estudo, farm\u00e1cia) sem negociar comigo mesmo?'},
+   {id:'d2',q:'Evitei ficar horas na cama ou procrastinar o que era prioridade?'},
+   {id:'d3',q:'Usei o celular e as redes de forma medida, sem fuga compulsiva?'},
+   {id:'d4',q:'Evitei que Discord, amigos ou celular atrapalhassem o estudo e o trabalho?'}
+ ]},
+ {id:'castidade',t:'3.2 \u00b7 Castidade e pureza',itens:[
+   {id:'c1',q:'Evitei pornografia e masturba\u00e7\u00e3o?'},
+   {id:'c2',q:'Evitei olhares e fantasias buscadas deliberadamente (academia, rua, internet)?'},
+   {id:'c3',q:'Evitei flerte, conte\u00fado sexual ou conversas que alimentam o v\u00ednculo antigo?',nh:true},
+   {id:'c4',q:'Evitei m\u00fasica ou conte\u00fado com letra ou imagem obscena?'}
+ ]},
+ {id:'caridade',t:'3.3 \u00b7 Caridade',sub:'M\u00e3e, fam\u00edlia, pr\u00f3ximo.',itens:[
+   {id:'k1',q:'Fui gentil e paciente com minha m\u00e3e e minha irm\u00e3, mesmo sob irrita\u00e7\u00e3o?',nh:true},
+   {id:'k2',q:'Evitei alimentar rancor ou falar mal da ex-namorada?',nh:true},
+   {id:'k5',q:'Evitei verbalizar qualquer reclama\u00e7\u00e3o?'},
+   {id:'k3',q:'Evitei fofoca e julgamento duro de algu\u00e9m?',nh:true},
+   {id:'k4',q:'Fui verdadeiro nas minhas palavras, sem mentiras, nem pequenas?'}
+ ]},
+ {id:'espiritual',t:'3.4 \u00b7 Vida espiritual',itens:[
+   {id:'e1',q:'Rezei al\u00e9m da \u00e2ncora da manh\u00e3 (ter\u00e7o, missa, leitura espiritual)?'},
+   {id:'e2',q:'Sexta-feira: cumpri a abstin\u00eancia de carne ou penit\u00eancia equivalente?',nh:true},
+   {id:'e3',q:'Busquei o estado de gra\u00e7a como meta real do dia, n\u00e3o como ideal abstrato?'}
+ ]},
+ {id:'COF',cof:true},
+ {id:'intrusivos',t:'4 \u00b7 Pensamentos intrusivos contra Deus',
+   nota:'Pensamentos blasfemos s\u00fabitos e n\u00e3o desejados, que voc\u00ea n\u00e3o busca e dos quais tem nojo, n\u00e3o entram neste exame como pecado: s\u00e3o fen\u00f4meno intrusivo, n\u00e3o consentimento da vontade. N\u00e3o os liste todo dia; isso alimenta escr\u00fapulo, n\u00e3o contri\u00e7\u00e3o. S\u00f3 \u00e9 mat\u00e9ria de exame se houve consentimento deliberado e buscado \u2014 e essa \u00e9 a \u00fanica pergunta abaixo.',
+   itens:[
+   {id:'i1',q:'Alimentei conscientemente algum deles, consentindo de prop\u00f3sito?',inv:true,nh:true}
+ ]},
+ {id:'mort',t:'5.1 \u00b7 Mortifica\u00e7\u00f5es fixas',itens:[
+   {id:'m1',q:'Sem celular ao acordar, antes da reza da manh\u00e3.'},
+   {id:'m2',q:'Sem celular durante as refei\u00e7\u00f5es.'},
+   {id:'m3',q:'P\u00f3s-treino: fui direto ao banho, sem sentar com o celular.',nh:true}
+ ]},
+ {id:'virt',t:'5.2 \u00b7 Virtudes-alvo',itens:[
+   {id:'v1',q:'Disciplina \u2014 comecei sem negociar.'},
+   {id:'v2',q:'Const\u00e2ncia \u2014 retomei r\u00e1pido ao cair.',nh:true},
+   {id:'v3',q:'Temperan\u00e7a \u2014 medida com telas e comida.'},
+   {id:'v4',q:'Fortaleza \u2014 aguentei o desconforto do dever.'}
+ ]},
+ {id:'proposito',t:'6 \u00b7 Ant\u00eddoto-chave e prop\u00f3sito para amanh\u00e3',
+   nota:'Quando volto a fazer, vejo que amo. A a\u00e7\u00e3o precede o \u00e2nimo, n\u00e3o o contr\u00e1rio. N\u00e3o espere sentir vontade para come\u00e7ar: comece, e a vontade vem depois, como consequ\u00eancia do ato.',
+   itens:[
+   {id:'p1',q:'Defini um prop\u00f3sito s\u00f3, concreto e pequeno, para amanh\u00e3?'}
+ ]},
+ {id:'conclusao',t:'7 \u00b7 Conclus\u00e3o',itens:[
+   {id:'f1',q:'Fiz o Ato de Contri\u00e7\u00e3o, com dor real pelo pecado e prop\u00f3sito de emenda?'},
+   {id:'f2',q:'Rezei Pai-Nosso, Ave-Maria e Santo Anjo da Guarda?'}
+ ],nota:'Se houve pecado grave, prop\u00f3sito firme de buscar a confiss\u00e3o antes de comungar.'}
+];
+
+/* ==================================================================
+   4. REGRAS COF  <<<<<<  BLOCO ÚNICO A TROCAR TODO MÊS  >>>>>>
+   Troque o rótulo e as 15 regras. Mantenha o id de uma regra
+   se ela continuar valendo no mês seguinte: o histórico dela
+   continua. Id novo = regra nova, histórico começa do zero.
+   Formato do id: AAAA-MM-NN
+   ================================================================== */
+const COF_ROTULO='agosto de 2026';
+const COF_REGRAS=[
+ {id:'2026-08-01',t:'Cavar onde estou',
+  se:'eu me pegar buscando um problema mais amplo ou mais nobre que o que est\u00e1 na minha frente',
+  entao:'volto ao problema concreto do meu lugar e do meu momento'},
+ {id:'2026-08-02',t:'Aceitar sem reclamar',
+  se:'algo acontecer contra a minha vontade, ou surgir dor, atraso ou chatice',
+  entao:'aceito sem obje\u00e7\u00e3o e rezo, em vez de reclamar'},
+ {id:'2026-08-03',t:'Voto de pobreza em opini\u00e3o',
+  se:'me pedirem opini\u00e3o sobre algo que eu n\u00e3o investiguei',
+  entao:'digo que n\u00e3o sei, ou gradu\u00e1o: certeza, probabilidade, verossimilhan\u00e7a, mera possibilidade'},
+ {id:'2026-08-04',t:'Fechar o tribunal interior',
+  se:'eu me pegar em discurso mental de acusa\u00e7\u00e3o e defesa sobre mim mesmo',
+  entao:'interrompo e entrego a Deus, em vez de ruminar'},
+ {id:'2026-08-05',t:'N\u00e3o falar mal de ningu\u00e9m',
+  se:'a conversa virar fofoca ou ju\u00edzo sobre quem n\u00e3o est\u00e1 presente',
+  entao:'calo ou mudo de assunto'},
+ {id:'2026-08-06',t:'Ignorar cr\u00edtica n\u00e3o pedida',
+  se:'eu receber cr\u00edtica que n\u00e3o pedi e que n\u00e3o vem de autoridade leg\u00edtima',
+  entao:'n\u00e3o respondo e n\u00e3o rumino'},
+ {id:'2026-08-07',t:'Cumprir a obriga\u00e7\u00e3o, ainda que mal',
+  se:'eu quiser adiar um dever (aula, estudo, farm\u00e1cia, casa) alegando cansa\u00e7o ou outra prioridade',
+  entao:'cumpro assim mesmo, imperfeitamente, sem fugir'},
+ {id:'2026-08-08',t:'Leitura executiva',
+  se:'eu abrir um livro de filosofia',
+  entao:'paro em cada unidade fechada at\u00e9 a frase virar percep\u00e7\u00e3o, e s\u00f3 ent\u00e3o avan\u00e7o'},
+ {id:'2026-08-09',t:'Teto de duas horas de estudo formal',
+  se:'eu passar de duas horas de estudo formal (ler tomando nota para uma finalidade)',
+  entao:'troco para leitura livre, fic\u00e7\u00e3o ou m\u00fasica'},
+ {id:'2026-08-10',t:'N\u00e3o calcular o que v\u00e3o pensar',
+  se:'eu me pegar calculando o que os outros v\u00e3o pensar antes de falar ou agir',
+  entao:'decido pelo que devo \u00e0 consci\u00eancia e a Deus, n\u00e3o pela aprova\u00e7\u00e3o'},
+ {id:'2026-08-11',t:'Palavra com lastro',
+  se:'eu usar ou ouvir um termo abstrato sem exemplo concreto por tr\u00e1s',
+  entao:'exijo o exemplo real; se n\u00e3o houver, n\u00e3o uso a palavra'},
+ {id:'2026-08-12',t:'N\u00e3o explicar a quem zomba',
+  se:'algu\u00e9m desdenhar ou zombar do que eu estudo',
+  entao:'n\u00e3o explico, n\u00e3o me justifico e sigo'},
+ {id:'2026-08-13',t:'Reabsorver a circunst\u00e2ncia',
+  se:'aparecer um obst\u00e1culo que atrapalhe a rotina ou o plano',
+  entao:'pergunto como us\u00e1-lo a favor do fim, em vez de brigar com ele'},
+ {id:'2026-08-14',t:'Repert\u00f3rio da minha ignor\u00e2ncia',
+  se:'eu topar com um termo, autor ou problema que n\u00e3o domino',
+  entao:'anoto na lista da minha ignor\u00e2ncia, em vez de fingir que sei'},
+ {id:'2026-08-15',t:'Confiss\u00e3o noturna',
+  se:'eu deitar',
+  entao:'conto o dia como foi, sem exagerar nem atenuar, e nomeio um autoengano'}
+];
+/* ================= fim do bloco a trocar todo mês ================= */
+
 /* ------- estado ------- */
 let hoje=new Date(); let diaSel=fmt(hoje);
 let semSel=segunda(hoje);
-let insModo='sem'; let insSem=segunda(hoje); let insMes=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1));
+let exaSel=fmt(hoje);
+let insModo='sem'; let insSem=segunda(hoje); let insMes=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1)); let insExa=fmt(hoje);
 
 function fmt(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
 function segunda(d){const x=new Date(d);const g=(x.getDay()+6)%7;x.setDate(x.getDate()-g);return fmt(x)}
@@ -205,6 +360,8 @@ function labelDia(iso){const d=new Date(iso+'T12:00:00');const w=['dom','seg','t
 function labelSem(iso){const f=addDias(iso,6);const a=new Date(iso+'T12:00:00'),b=new Date(f+'T12:00:00');return a.getDate()+'/'+(a.getMonth()+1)+' a '+b.getDate()+'/'+(b.getMonth()+1)}
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function labelMes(iso){const d=new Date(iso+'T12:00:00');return MESES[d.getMonth()]+' de '+d.getFullYear()}
+function labelCurto(iso){const d=new Date(iso+'T12:00:00');return d.getDate()+'/'+(d.getMonth()+1)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 /* ------- storage ------- */
 function getKey(k){try{const r=localStorage.getItem(PREFIX+k);return r?JSON.parse(r):{}}catch(e){return{}}}
@@ -213,8 +370,12 @@ function loadDia(iso){return getKey('dia:'+iso)}
 function saveDia(iso,d){setKey('dia:'+iso,d)}
 function loadSem(iso){return getKey('sem:'+iso)}
 function saveSem(iso,d){setKey('sem:'+iso,d)}
+function loadExa(iso){return getKey('exame:'+iso)}
+function saveExa(iso,d){setKey('exame:'+iso,d)}
+function loadCof(iso){return getKey('cof:'+iso)}
+function saveCof(iso,d){setKey('cof:'+iso,d)}
 
-/* ------- classificação de estado ------- */
+/* ------- classificação de estado (métricas) ------- */
 /* retorna: 'abaixo' | 'min' | 'ideal' | null */
 function classifica(m,st){
  if(m.teto){if(st==='ok')return 'ideal'; if(st==='estourou')return 'abaixo'; return null}
@@ -288,7 +449,84 @@ function conta(id,n){
 }
 function mudarSemana(n){semSel=addDias(semSel,7*n);renderSem()}
 
-/* ------- agregadores ------- */
+/* ------- visão exame ------- */
+function clsEx(v,inv){if(v==='nh')return 'on-nh';return v===(inv?'nao':'sim')?'on-ideal':'on-abaixo'}
+function segEx(itemId,val,cur,txt,inv){
+ return '<button data-ex="'+itemId+'" data-v="'+val+'" data-inv="'+(inv?1:0)+'" class="'+(cur===val?clsEx(val,inv):'')+'">'+txt+'</button>';
+}
+function renderExa(){
+ document.getElementById('elabel').textContent=labelDia(exaSel);
+ const d=loadExa(exaSel), c=loadCof(exaSel);
+ let html='<div class="ex-nota">Coloque-se na presença de Deus. Respire. Senhor, mostra-me com verdade o meu dia. Hoje serei simples e sincero, comigo e com Ele.</div>';
+ for(const b of EXAME){
+   if(b.cof){html+=renderCofBloco(c);continue}
+   html+='<div class="area"><h2>'+esc(b.t)+'</h2>';
+   if(b.sub)html+='<div class="sub2">'+esc(b.sub)+'</div>';
+   if(b.nota)html+='<div class="ex-nota">'+esc(b.nota)+'</div>';
+   if(b.itens)for(const it of b.itens){
+     const cur=d[it.id]||null;
+     html+='<div class="ex-item"><div class="ex-top"><div class="ex-q">'+esc(it.q)+(it.inv?'<span class="cof-se">Aqui, Não é a resposta fiel.</span>':'')+'</div><div class="seg">'+
+      segEx(it.id,'sim',cur,'Sim',it.inv)+
+      segEx(it.id,'nao',cur,'Não',it.inv)+
+      (it.nh?segEx(it.id,'nh',cur,'N.H.',it.inv):'')+
+      '</div></div></div>';
+   }
+   html+='</div>';
+ }
+ document.getElementById('lista-exa').innerHTML=html;
+}
+function renderCofBloco(c){
+ let h='<div class="area"><h2>Regras COF — '+esc(COF_ROTULO)+'</h2>'+
+  '<div class="sub2">Quinze regras do mês. N.H. = não houve ocasião; não conta como falta nem como cumprimento.</div>';
+ COF_REGRAS.forEach((r,i)=>{
+   const st=(c[r.id]||{}), cur=st.r||null, imp=st.m||null;
+   h+='<div class="ex-item" data-cofwrap="'+r.id+'"><div class="ex-top"><div class="ex-q">'+
+     '<span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+
+     (r.se||r.entao?'<span class="cof-se">Se '+esc(r.se)+' → então '+esc(r.entao)+'</span>':'')+
+     '</div><div class="seg">'+
+     '<button data-cof="'+r.id+'" data-v="cumpri" class="'+(cur==='cumpri'?'on-ideal':'')+'">Cumpri</button>'+
+     '<button data-cof="'+r.id+'" data-v="faltei" class="'+(cur==='faltei'?'on-abaixo':'')+'">Faltei</button>'+
+     '<button data-cof="'+r.id+'" data-v="nh" class="'+(cur==='nh'?'on-nh':'')+'">N.H.</button>'+
+     '</div></div>'+
+     '<div class="imput'+(cur==='faltei'?' show':'')+'" data-imp="'+r.id+'"><div class="q">A falta foi:</div><div class="seg">'+
+     '<button data-cofm="'+r.id+'" data-v="livre" class="'+(imp==='livre'?'on-abaixo':'')+'">Livre</button>'+
+     '<button data-cofm="'+r.id+'" data-v="misto" class="'+(imp==='misto'?'on-min':'')+'">Misto</button>'+
+     '<button data-cofm="'+r.id+'" data-v="compelido" class="'+(imp==='compelido'?'on-nh':'')+'">Compelido</button>'+
+     '</div></div></div>';
+ });
+ return h+'</div>';
+}
+document.getElementById('lista-exa').addEventListener('click',ev=>{
+ const b=ev.target.closest('button'); if(!b)return;
+ if(b.dataset.ex){
+   const d=loadExa(exaSel), id=b.dataset.ex, v=b.dataset.v;
+   d[id]=(d[id]===v)?null:v; saveExa(exaSel,d);
+   const inv=b.dataset.inv==='1';
+   b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(d[id]===x.dataset.v)?clsEx(x.dataset.v,inv):''});
+   return;
+ }
+ if(b.dataset.cof){
+   const c=loadCof(exaSel), id=b.dataset.cof, v=b.dataset.v;
+   const st=c[id]||{};
+   st.r=(st.r===v)?null:v;
+   if(st.r!=='faltei')st.m=null;
+   c[id]=st; saveCof(exaSel,c);
+   b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(st.r===x.dataset.v)?(x.dataset.v==='cumpri'?'on-ideal':x.dataset.v==='faltei'?'on-abaixo':'on-nh'):''});
+   const imp=document.querySelector('[data-imp="'+id+'"]');
+   imp.classList.toggle('show',st.r==='faltei');
+   if(st.r!=='faltei')imp.querySelectorAll('button').forEach(x=>x.className='');
+   return;
+ }
+ if(b.dataset.cofm){
+   const c=loadCof(exaSel), id=b.dataset.cofm, v=b.dataset.v;
+   const st=c[id]||{};
+   st.m=(st.m===v)?null:v; c[id]=st; saveCof(exaSel,c);
+   b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(st.m===x.dataset.v)?(x.dataset.v==='livre'?'on-abaixo':x.dataset.v==='misto'?'on-min':'on-nh'):''});
+ }
+});
+function mudarExame(n){exaSel=addDias(exaSel,n);renderExa()}
+
+/* ------- agregadores: métricas ------- */
 function statsDias(dias){
  const hojeIso=fmt(new Date());
  let ab=0,mi=0,idl=0,tot=0;
@@ -323,6 +561,56 @@ function idealDaSemana(iso){
  const s=statsDias(dias); return s.pctIdeal;
 }
 
+/* ------- agregadores: exame e COF ------- */
+function itensExame(){
+ const out=[]; for(const b of EXAME){if(b.itens)for(const it of b.itens)out.push({...it,bloco:b.t})}
+ return out;
+}
+function statsExame(dias){
+ const hojeIso=fmt(new Date());
+ const itens=itensExame();
+ const por={}; itens.forEach(i=>por[i.id]={fiel:0,falta:0,nh:0});
+ const porBloco={};
+ let fiel=0,falta=0,nh=0,feitos=0,contados=0;
+ for(const d of dias){
+   if(d>hojeIso)continue;
+   contados++;
+   const dd=loadExa(d);
+   let marcou=false;
+   for(const i of itens){
+     const v=dd[i.id]; if(!v)continue;
+     marcou=true;
+     if(v==='nh'){nh++;por[i.id].nh++}
+     else if(v===(i.inv?'nao':'sim')){fiel++;por[i.id].fiel++}
+     else{falta++;por[i.id].falta++}
+   }
+   if(marcou)feitos++;
+ }
+ for(const i of itens){
+   const b=i.bloco; if(!porBloco[b])porBloco[b]={fiel:0,falta:0};
+   porBloco[b].fiel+=por[i.id].fiel; porBloco[b].falta+=por[i.id].falta;
+ }
+ const reais=fiel+falta;
+ return {fiel,falta,nh,reais,por,porBloco,feitos,contados,itens,
+   pctFid:reais?Math.round(fiel/reais*100):0,
+   pctFeito:contados?Math.round(feitos/contados*100):0};
+}
+function statsCof(dias){
+ const hojeIso=fmt(new Date());
+ const por={}; COF_REGRAS.forEach(r=>por[r.id]={cumpri:0,faltei:0,nh:0,livre:0,misto:0,compelido:0});
+ for(const d of dias){
+   if(d>hojeIso)continue;
+   const dd=loadCof(d);
+   for(const r of COF_REGRAS){
+     const st=dd[r.id]; if(!st||!st.r)continue;
+     if(st.r==='cumpri')por[r.id].cumpri++;
+     else if(st.r==='nh')por[r.id].nh++;
+     else if(st.r==='faltei'){por[r.id].faltei++; if(st.m)por[r.id][st.m]++}
+   }
+ }
+ return por;
+}
+
 /* ------- avisos ------- */
 function gerarAvisos(s,escopo,semanaIso){
  const av=[];
@@ -344,10 +632,21 @@ function gerarAvisos(s,escopo,semanaIso){
  else av.push(['yellow','Piso em '+s.pctPiso+'%. Voltar ao começo pequeno inquebrável.']);
  return av;
 }
+function avisosExame(e){
+ const av=[];
+ if(e.feitos===0){av.push(['yellow','Nenhum exame registrado neste período ainda.']);return av}
+ if(e.pctFeito>=100)av.push(['gold','Exame feito em todos os dias do período.']);
+ else if(e.pctFeito<60)av.push(['yellow','Exame feito em '+e.pctFeito+'% dos dias. O exame só produz correção se for feito; comece pelo dia de hoje.']);
+ if(e.reais>0){
+   if(e.pctFid>=90)av.push(['green','Fidelidade de '+e.pctFid+'% nas ocasiões reais.']);
+   else if(e.pctFid<60)av.push(['red','Fidelidade de '+e.pctFid+'% nas ocasiões reais. Um defeito-raiz de cada vez: pegue o item de maior recorrência abaixo e faça só dele o propósito.']);
+ }
+ return av;
+}
 
 /* ------- insights ------- */
 function renderIns(){
- if(insModo==='sem')renderInsSem(); else renderInsMes();
+ if(insModo==='sem')renderInsSem(); else if(insModo==='mes')renderInsMes(); else renderInsExa();
 }
 function renderInsSem(){
  document.getElementById('ilabel').textContent='Semana '+labelSem(insSem);
@@ -380,7 +679,7 @@ function renderInsSem(){
    else if(okMin&&m.min>0)tag='<span class="tag ok">mín ok</span>';
    else if(m.min===0)tag='<span class="tag zero">'+v+'x</span>';
    else tag='<span class="tag miss">'+v+' de '+m.min+'</span>';
-   wLista+='<div class="wk-item"><span>'+m.n+'</span>'+tag+'</div>';
+   wLista+='<div class="wk-item"><span class="txt">'+m.n+'</span>'+tag+'</div>';
  }
  const wPct=wTot?Math.round(wHitMin/wTot*100):0;
  const avisos=gerarAvisos(s,'sem',insSem).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
@@ -410,7 +709,7 @@ function renderInsMes(){
  let grade='';
  for(const m of DIARIAS){
    const pm=s.porMetrica[m.id];
-   grade+='<div class="wk-item"><span>'+m.n+'</span><span style="display:flex;gap:6px">'+
+   grade+='<div class="wk-item"><span class="txt">'+m.n+'</span><span style="display:flex;gap:6px">'+
     '<span class="tag miss">'+pm.ab+'</span><span class="tag ok">'+pm.mi+'</span><span class="tag gold">'+pm.idl+'</span></span></div>';
  }
 
@@ -439,15 +738,74 @@ function renderInsMes(){
   '<div class="insight-card"><div class="lbl">Semanais do mês — pisos batidos</div><div class="big">'+wHit+'<small> de '+wTot+' ('+wPct+'%)</small></div></div>'+
   '<div class="note">Falhar o alvo não é falhar. Falhar o piso pede correção amanhã, sem veredito.</div>';
 }
+function renderInsExa(){
+ document.getElementById('ilabel').textContent='30 dias até '+labelCurto(insExa);
+ const dias=[...Array(30)].map((_,i)=>addDias(insExa,-29+i));
+ const e=statsExame(dias);
+ const cof=statsCof(dias);
+ const avisos=avisosExame(e).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
+
+ let blocos='';
+ for(const b in e.porBloco){
+   const x=e.porBloco[b], r=x.fiel+x.falta;
+   const p=r?Math.round(x.fiel/r*100):0;
+   const cls=!r?'zero':p>=90?'gold':p>=60?'ok':'miss';
+   blocos+='<div class="wk-item"><span class="txt">'+esc(b)+'</span><span class="tag '+cls+'">'+(r?p+'%':'—')+'</span></div>';
+ }
+
+ let grade='';
+ for(const i of e.itens){
+   const p=e.por[i.id];
+   grade+='<div class="wk-item"><span class="txt">'+esc(i.q)+'</span><span style="display:flex;gap:6px">'+
+    '<span class="tag gold">'+p.fiel+'</span><span class="tag miss">'+p.falta+'</span><span class="tag nh">'+p.nh+'</span></span></div>';
+ }
+
+ const raiz=[...e.itens].map(i=>({q:i.q,n:e.por[i.id].falta})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,5);
+ const raizHtml=raiz.length?raiz.map(x=>'<div class="wk-item"><span class="txt">'+esc(x.q)+'</span><span class="tag miss">'+x.n+'</span></div>').join('')
+   :'<div style="color:var(--ink-2);font-size:13px">Nenhuma falta registrada no período.</div>';
+
+ let cofHtml='';
+ COF_REGRAS.forEach((r,i)=>{
+   const p=cof[r.id];
+   const reais=p.cumpri+p.faltei;
+   const pct=reais?Math.round(p.cumpri/reais*100):null;
+   const imp=p.faltei?(' · L '+p.livre+' M '+p.misto+' C '+p.compelido):'';
+   cofHtml+='<div class="wk-item"><span class="txt"><span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+
+    '<span class="cof-se">'+p.faltei+' faltas · '+p.nh+' sem ocasião · '+p.cumpri+' cumpridas'+imp+'</span></span>'+
+    '<span class="tag '+(pct===null?'zero':pct>=90?'gold':pct>=60?'ok':'miss')+'">'+(pct===null?'—':pct+'%')+'</span></div>';
+ });
+
+ document.getElementById('painel-ins').innerHTML=
+  avisos+
+  '<div class="row3">'+
+   '<div class="insight-card"><div class="lbl">Exames feitos</div><div class="big">'+e.feitos+'<small> de '+e.contados+'</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Fidelidade</div><div class="big" style="color:var(--ideal-c)">'+e.pctFid+'<small>%</small></div></div>'+
+   '<div class="insight-card"><div class="lbl">Sem ocasião</div><div class="big" style="color:var(--nh-c)">'+e.nh+'</div></div>'+
+  '</div>'+
+  '<div class="insight-card"><div class="lbl">Fidelidade por bloco — fiel sobre ocasiões reais</div>'+blocos+'</div>'+
+  '<div class="insight-card"><div class="lbl">Defeitos-raiz — itens com mais faltas</div>'+
+   '<div style="color:var(--ink-2);font-size:12px;margin-bottom:6px">Um defeito-raiz de cada vez. Pegue o primeiro e faça só dele o propósito de amanhã.</div>'+
+   raizHtml+'</div>'+
+  '<div class="insight-card"><div class="lbl">Regras COF — '+esc(COF_ROTULO)+'</div>'+
+   '<div class="legend"><span><span class="tag gold">n</span>cumpri</span><span><span class="tag miss">n</span>faltei</span><span><span class="tag nh">n</span>sem ocasião</span></div>'+
+   '<div style="color:var(--ink-2);font-size:12px;margin:6px 0">L, M, C = falta livre, mista, compelida. O percentual é sobre as ocasiões reais, não sobre os 30 dias.</div>'+
+   cofHtml+'</div>'+
+  '<div class="insight-card"><div class="lbl">Exame — item a item (fiel · falta · sem ocasião, em dias)</div>'+
+   '<div class="legend"><span><span class="tag gold">n</span>fiel</span><span><span class="tag miss">n</span>falta</span><span><span class="tag nh">n</span>sem ocasião</span></div>'+
+   grade+'</div>'+
+  '<div class="note">Item não respondido não conta como falta. Exame em chave de contrição, não de autoflagelação.</div>';
+}
 function modo(m){
  insModo=m;
  document.getElementById('mb-sem').classList.toggle('on',m==='sem');
  document.getElementById('mb-mes').classList.toggle('on',m==='mes');
+ document.getElementById('mb-exa').classList.toggle('on',m==='exa');
  renderIns();
 }
 function mudarIns(n){
  if(insModo==='sem')insSem=addDias(insSem,7*n);
- else{const d=new Date(insMes+'T12:00:00');d.setMonth(d.getMonth()+n);insMes=fmt(new Date(d.getFullYear(),d.getMonth(),1))}
+ else if(insModo==='mes'){const d=new Date(insMes+'T12:00:00');d.setMonth(d.getMonth()+n);insMes=fmt(new Date(d.getFullYear(),d.getMonth(),1))}
+ else insExa=addDias(insExa,30*n);
  renderIns();
 }
 
@@ -467,6 +825,7 @@ function exportar(){
 }
 function importar(ev){
  const f=ev.target.files[0]; if(!f)return;
+ if(!confirm('Importar sobrescreve os registros que tiverem a mesma data. Continuar?')){ev.target.value='';return}
  const r=new FileReader();
  r.onload=()=>{
    try{
@@ -474,7 +833,7 @@ function importar(ev){
      let n=0;
      for(const k in dump){if(k.startsWith(PREFIX)){localStorage.setItem(k,dump[k]);n++}}
      alert('Backup importado: '+n+' registros.');
-     renderDia();renderSem();renderIns();
+     renderDia();renderSem();renderExa();renderIns();
    }catch(e){alert('Arquivo inválido.')}
  };
  r.readAsText(f);
@@ -483,11 +842,11 @@ function importar(ev){
 
 /* ------- navegação ------- */
 function tab(t){
- for(const v of['dia','sem','ins']){
+ for(const v of['dia','sem','exa','ins']){
    document.getElementById('view-'+v).classList.toggle('hidden',v!==t);
    document.getElementById('nb-'+v).classList.toggle('active',v===t);
  }
- if(t==='dia')renderDia(); if(t==='sem')renderSem(); if(t==='ins')renderIns();
+ if(t==='dia')renderDia(); if(t==='sem')renderSem(); if(t==='exa')renderExa(); if(t==='ins')renderIns();
 }
 renderDia();
 </script>
