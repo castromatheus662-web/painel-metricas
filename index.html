@@ -4,20 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Painel de Métricas</title>
+<meta name="theme-color" content="#7A1F2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Painel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
 <style>
   :root{
-    --paper:#F4F4F0;
-    --card:#FFFFFF;
-    --ink:#171715;
-    --ink-2:#5A5A54;
-    --line:#DCDCD4;
-    --rubric:#7A1F2B;
-    --abaixo-c:#A33028;      /* vermelho: abaixo do mínimo */
-    --min-c:#B8860B;         /* amarelo escuro: mínimo */
-    --min-bg:#E8C33C;
-    --ideal-c:#2E5339;       /* verde: ideal */
-    --nh-c:#8A8A82;          /* cinza: não houve ocasião */
-    --radius:10px;
+    --paper:#F4F4F0; --card:#FFFFFF; --ink:#171715; --ink-2:#5A5A54; --line:#DCDCD4;
+    --rubric:#7A1F2B; --abaixo-c:#A33028; --min-c:#B8860B; --min-bg:#E8C33C; --ideal-c:#2E5339; --nh-c:#8A8A82;
+    --azul:#2F5D8A; --radius:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{background:var(--paper);color:var(--ink);font:15px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
@@ -35,9 +33,11 @@
   .item .info{flex:1;min-width:150px}
   .item .name{font-weight:600;font-size:14.5px}
   .item .meta{color:var(--ink-2);font-size:12px;margin-top:1px}
+  .item .pq{color:var(--ink-2);font-size:11.5px;margin-top:2px;font-style:italic}
   .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
   .seg button{border:0;background:var(--card);color:var(--ink-2);font-size:12px;font-weight:600;padding:9px 9px;border-left:1px solid var(--line)}
   .seg button:first-child{border-left:0}
+  .seg.escala button{padding:9px 7px;font-size:11.5px}
   .seg button.on-abaixo{background:var(--abaixo-c);color:#fff}
   .seg button.on-min{background:var(--min-bg);color:var(--ink)}
   .seg button.on-ideal{background:var(--ideal-c);color:#fff}
@@ -48,10 +48,10 @@
   .status-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0}
   .dot-min{background:var(--min-bg)} .dot-ideal{background:var(--ideal-c)}
   nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex}
-  nav button{flex:1;padding:13px 0 max(13px, env(safe-area-inset-bottom));background:none;border:0;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  nav button{flex:1;padding:12px 0 max(12px, env(safe-area-inset-bottom));background:none;border:0;font-size:11.5px;font-weight:600;color:var(--ink-2)}
   nav button.active{color:var(--rubric)}
-  nav button.active .bar{width:26px;height:3px;background:var(--rubric);border-radius:2px;margin:4px auto 0}
-  nav .bar{width:26px;height:3px;background:transparent;margin:4px auto 0}
+  nav button.active .bar{width:22px;height:3px;background:var(--rubric);border-radius:2px;margin:4px auto 0}
+  nav .bar{width:22px;height:3px;background:transparent;margin:4px auto 0}
   .insight-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
   .big{font-family:Georgia,serif;font-size:32px;font-weight:600;line-height:1}
   .big small{font-size:13px;color:var(--ink-2);font-family:-apple-system,sans-serif;font-weight:400}
@@ -87,29 +87,123 @@
   .legend{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin:8px 0 2px}
   .legend span{display:flex;align-items:center;gap:4px}
   .legend .cell{width:12px;height:12px}
-  .modebar{display:flex;justify-content:center;gap:0;margin:8px 0}
-  .modebar button{border:1px solid var(--line);background:var(--card);padding:8px 14px;font-size:13px;font-weight:600;color:var(--ink-2)}
+  .modebar{display:flex;justify-content:center;gap:0;margin:8px 0;flex-wrap:wrap}
+  .modebar button{border:1px solid var(--line);background:var(--card);padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink-2)}
   .modebar button:first-child{border-radius:8px 0 0 8px}
   .modebar button+button{border-left:0}
   .modebar button:last-child{border-radius:0 8px 8px 0}
   .modebar button.on{background:var(--rubric);border-color:var(--rubric);color:#fff}
   .note{color:var(--ink-2);font-size:12px;text-align:center;margin:14px 0}
   .hidden{display:none}
-  .backup{display:flex;gap:8px;justify-content:center;margin:16px 0}
-  .backup button,.backup label{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+  .backup{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+  .backup button,.backup label,.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+  .btn.primary{background:var(--rubric);border-color:var(--rubric);color:#fff}
+  .btn.small{padding:6px 10px;font-size:12px}
   .backup input{display:none}
-  /* exame */
   .ex-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px}
   .ex-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .ex-q{flex:1;min-width:150px;font-size:14px;line-height:1.35}
   .ex-nota{background:#F3ECD9;border:1px solid #DCC98F;color:#5C4B10;border-radius:var(--radius);padding:11px 13px;margin-bottom:8px;font-size:12.5px;line-height:1.5}
-  .ex-txt{width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;font:14px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);min-height:76px;margin-bottom:8px;resize:vertical}
-  .ex-txt::placeholder{color:var(--ink-2)}
   .imput{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--paper);align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .imput.show{display:flex}
   .imput .q{font-size:12.5px;color:var(--ink-2);font-weight:600}
   .cof-num{color:var(--rubric);font-weight:700;font-size:12px;margin-right:6px}
   .cof-se{display:block;color:var(--ink-2);font-size:12.5px;margin-top:3px}
+  input[type=number],input[type=date],input[type=text],textarea{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:14px -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--card)}
+  input[type=number]{width:84px}
+  textarea{width:100%;min-height:60px;resize:vertical}
+  /* manhã */
+  .afirm{font-family:"Iowan Old Style",Palatino,"Book Antiqua",Georgia,serif;font-size:21px;line-height:1.3;font-weight:600;color:var(--ink);padding:6px 2px 10px}
+  .mcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
+  .mcard .lbl{margin-bottom:4px}
+  .mcard .k{font-size:14.5px;line-height:1.45;padding:5px 0;border-bottom:1px solid var(--paper)}
+  .mcard .k:last-child{border-bottom:0}
+  .mcard .k .tp{color:var(--rubric);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+  .mcard.pai{border-color:#CBB98A;background:#FBF8EF}
+  .belts{display:flex;gap:3px;margin:6px 0}
+  .belts div{flex:1;height:8px;border-radius:3px;background:var(--paper);border:1px solid var(--line);position:relative;overflow:hidden}
+  .belts div i{display:block;height:100%;background:var(--azul)}
+  .objcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
+  .objcard .oname{font-weight:600;font-size:15px}
+  .objcard .onum{font-family:Georgia,serif;font-size:20px;font-weight:600;margin-top:2px}
+  .objcard .onum small{font-size:12px;color:var(--ink-2);font-family:-apple-system,sans-serif;font-weight:400}
+  .objcard .edit{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--ink-2)}
+  .toggle{display:flex;justify-content:flex-end;margin-top:6px}
+  .lista-full{display:none}
+  .lista-full.show{display:block}
+  .add{display:flex;gap:6px;margin-top:8px;flex-direction:column}
+  .cfgrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--paper);font-size:13.5px;flex-wrap:wrap}
+  .cfgrow:last-child{border-bottom:0}
+  .notes{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+  .notes b{color:var(--ideal-c)}
+  .lnk{background:none;border:0;padding:0;color:var(--vinho,#7A1F2B);text-decoration:underline;font:inherit;cursor:pointer}
+  /* v3: limpo e com recompensa visual */
+  .item .pq{display:none}
+  .item .info.open .pq{display:block}
+  .item.done{border-color:#BFD5C5;background:#F4F9F5}
+  .item.half{border-color:#E4D6A8;background:#FCF9EE}
+  .area h2 .cnt{float:right;letter-spacing:0;text-transform:none;font-weight:600;color:var(--ink-2)}
+  .topo{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-top:8px}
+  .topotxt .tn{font-family:Georgia,serif;font-size:24px;font-weight:600;line-height:1.1}
+  .topotxt .ts{color:var(--ink-2);font-size:12.5px}
+  .ring{position:relative;width:64px;height:64px;flex-shrink:0}
+  .ring svg{width:64px;height:64px;transform:rotate(-90deg)}
+  .ring circle{fill:none;stroke-width:6}
+  .ring .bg{stroke:var(--paper)}
+  .ring .fg{stroke:var(--ideal-c);stroke-linecap:round;transition:stroke-dashoffset .4s}
+  .ring .rt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .ring .rn{font-weight:700;font-size:13px}
+  .ring .rs{font-size:9px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+  .stripe{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 12px}
+  .seqarea{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rubric);font-weight:700;border-bottom:1px solid var(--line);padding-bottom:4px;margin:12px 0 6px}
+  .st{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 6px;text-align:center}
+  .st .stn{font-family:Georgia,serif;font-size:26px;font-weight:600;line-height:1;color:var(--ideal-c)}
+  .st .stl{font-size:10.5px;color:var(--ink-2);margin-top:4px;line-height:1.25}
+  .objcard .ohead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .objcard .opct{font-family:Georgia,serif;font-size:20px;font-weight:600;color:var(--azul)}
+  .objcard.seq .seqnum{font-family:Georgia,serif;font-size:30px;font-weight:600;line-height:1.1;color:var(--ideal-c);margin-top:2px}
+  .objcard.seq .seqnum small{font-size:12px;color:var(--ink-2);font-family:-apple-system,sans-serif;font-weight:400}
+  .objcard .pq{color:var(--ink-2);font-size:11.5px;margin-top:6px;font-style:italic}
+  .objcard .origem{color:var(--azul);font-size:11px;margin-top:4px}
+  .objcard .break{color:var(--ink-2);font-size:11.5px;margin-top:4px}
+  .objcard .edit label{display:flex;align-items:center;gap:6px}
+  .objcard .edit input[type=number]{width:70px;padding:5px 7px;font-size:13px}
+  .mcard .k{font-size:14px}
+  .arranque{display:flex;align-items:center;flex-wrap:wrap;gap:4px 2px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin:4px 0 2px}
+  .arranque .ar{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;white-space:nowrap}
+  .arranque .ar b{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--rubric);color:#fff;font-size:10px;font-weight:700}
+  .arranque i{color:var(--line);font-style:normal;padding:0 3px}
+  .mcard.hist{border-color:#C9BFA8;background:#FCFAF4}
+  .mcard.proc{border-color:#D3BDBD;background:#FCF7F7}
+  .titem{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px;margin-bottom:7px}
+  .titem.on{border-color:#BFD5C5;background:#F4F9F5}
+  .titem .tbox{width:23px;height:23px;border:1.5px solid var(--line);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;background:var(--card)}
+  .titem.on .tbox{background:var(--ideal-c);border-color:var(--ideal-c)}
+  .titem .ttxt{flex:1;font-size:14.5px;line-height:1.35}
+  .titem.on .ttxt{color:var(--ink-2)}
+  .topc{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+  .mcard.proc .hy{color:var(--abaixo-c)}
+  .mcard.confie{border-color:#B6C9B9;background:#F5FAF6}
+  .mcard.mapa{border-color:#C0B9A0;background:#FAF8F0}
+  .mcard.abertura{border-color:#B9A8B4;background:#FAF6F9;margin-top:8px}
+  .mcard.abertura .k{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:15.5px;line-height:1.4}
+  .mcard.perdendo{border-color:#CDBCC6;background:#FBF6F9}
+  .mcard.perd{border-color:#C9B9C6;background:#FAF6F9}
+  .mcard.confie .k:last-child{font-weight:700;color:var(--ideal-c)}
+  .mcard.bela{border-color:#B9CBD6;background:#F6FAFC}
+  .mcard.heroi{border-color:#C4C0A8;background:#FAFAF2}
+  .mcard.bel{border-color:#B9CCC0;background:#F5FAF6}
+  .mcard.her{border-color:#C3B9D2;background:#F8F6FB}
+  .mcard.bela{border-color:#B9CBC0;background:#F5FAF7}
+  .hrow{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--paper);font-size:13.5px;line-height:1.4}
+  .hrow:last-child{border-bottom:0}
+  .hrow .hy{flex-shrink:0;width:74px;color:var(--rubric);font-weight:700;font-size:11.5px;padding-top:2px;letter-spacing:.02em}
+  .hrow .ht{flex:1}
+  .hresumo{font-size:13.5px;line-height:1.45;padding:2px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--line);color:var(--ink)}
+  .orow{margin:7px 0 9px}
+  .orow .otop{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;margin-bottom:4px}
+  .orow .otop span:last-child{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+  .orow .belts{margin:0}
 </style>
 </head>
 <body>
@@ -119,6 +213,14 @@
 </header>
 
 <div class="wrap">
+  <div id="view-tat">
+    <div id="painel-tat"></div>
+  </div>
+
+  <div id="view-man" class="hidden">
+    <div id="painel-man"></div>
+  </div>
+
   <div id="view-dia">
     <div class="datebar">
       <button onclick="mudarDia(-1)">‹</button>
@@ -136,7 +238,7 @@
       <button onclick="mudarSemana(1)">›</button>
     </div>
     <div id="lista-sem"></div>
-    <div class="note">Preencher no domingo, na revisão semanal: registre quantas vezes fez cada item na semana.</div>
+    <div class="note">Marque no dia em que fez. No domingo, revise a semana inteira.</div>
   </div>
 
   <div id="view-exa" class="hidden">
@@ -149,10 +251,15 @@
     <div class="note">Noite, 8 a 10 minutos. Verdade diante de Deus: sem desculpa, sem desespero. Um defeito-raiz de cada vez.</div>
   </div>
 
+  <div id="view-obj" class="hidden">
+    <div id="painel-obj"></div>
+  </div>
+
   <div id="view-ins" class="hidden">
     <div class="modebar">
       <button id="mb-sem" class="on" onclick="modo('sem')">Semanal</button>
       <button id="mb-mes" onclick="modo('mes')">Mensal</button>
+      <button id="mb-ano" onclick="modo('ano')">Anual</button>
       <button id="mb-exa" onclick="modo('exa')">Exame</button>
     </div>
     <div class="datebar">
@@ -161,6 +268,7 @@
       <button onclick="mudarIns(1)">›</button>
     </div>
     <div id="painel-ins"></div>
+    <div id="painel-cfg"></div>
     <div class="backup">
       <button onclick="exportar()">Exportar backup</button>
       <label>Importar backup<input type="file" accept=".json" onchange="importar(event)"></label>
@@ -170,192 +278,819 @@
 </div>
 
 <nav>
-  <button id="nb-dia" class="active" onclick="tab('dia')">Diário<div class="bar"></div></button>
-  <button id="nb-sem" onclick="tab('sem')">Semanal<div class="bar"></div></button>
+  <button id="nb-tat" class="active" onclick="tab('tat')">Tática<div class="bar"></div></button>
+  <button id="nb-man" onclick="tab('man')">Manhã<div class="bar"></div></button>
+  <button id="nb-dia" onclick="tab('dia')">Dia<div class="bar"></div></button>
+  <button id="nb-sem" onclick="tab('sem')">Semana<div class="bar"></div></button>
   <button id="nb-exa" onclick="tab('exa')">Exame<div class="bar"></div></button>
+  <button id="nb-obj" onclick="tab('obj')">Objetivos<div class="bar"></div></button>
   <button id="nb-ins" onclick="tab('ins')">Insights<div class="bar"></div></button>
 </nav>
 
 <script>
 /* ==================================================================
+   0. CONFIGURAÇÃO
+   Todos os itens ficam ativos.
+   ================================================================== */
+const PREFIX='painel-metricas:';
+const AREAS=['Espiritual','Intelectual','Financeiro','Físico','Relacionamentos','Pessoal'];
+const CFG_PADRAO={inicio:null,obj:{}};
+
+/* ==================================================================
    1. MÉTRICAS DIÁRIAS
+   ideal '—' = binário (Abaixo / Feito). teto:true = Estourou / Dentro.
+   tipo 'contador' = blocos com sub-contadores, piso e alvo semanais.
+   pq = por quê: objetivo que a métrica serve. gatilho = habit stacking.
    ================================================================== */
 const DIARIAS=[
- {id:'terco',n:'Terço',a:'Espiritual',min:'1x',ideal:'1x'},
- {id:'rezas',n:'Rezas do dia',a:'Espiritual',min:'algumas',ideal:'todas'},
- {id:'exame',n:'Exame de consciência',a:'Espiritual',min:'1x',ideal:'1x'},
- {id:'leitura',n:'Leitura',a:'Intelectual',min:'1,5h',ideal:'3h'},
- {id:'trabalho',n:'Tempo de trabalho',a:'Financeiro',min:'1h',ideal:'5h'},
- {id:'creatina',n:'Creatina 10 g',a:'Físico',min:'1x',ideal:'1x'},
- {id:'beta',n:'Beta-alanina 6 g',a:'Físico',min:'1 dose de 6 g',ideal:'3 doses de 2 g'},
- {id:'multi',n:'Multivitamínico',a:'Físico',min:'1',ideal:'2'},
- {id:'mela',n:'Melatonina',a:'Físico',teto:true,min:'0 mg',ideal:'máx 1 mg'},
- {id:'minox',n:'Minoxidil 0,5 ml',a:'Físico',min:'1x',ideal:'2x'},
- {id:'dentes',n:'Escovar os dentes',a:'Físico',min:'2x',ideal:'após cada refeição'},
- {id:'fruta',n:'Fruta e vegetais',a:'Físico',min:'um pouco dos dois',ideal:'300 g + 300 g'},
- {id:'agua',n:'Água',a:'Físico',min:'2,5 L',ideal:'4,5 L'},
- {id:'along',n:'Alongamento',a:'Físico',min:'1x',ideal:'1x'},
- {id:'grip',n:'Handgrip',a:'Físico',min:'1x',ideal:'1x'},
- {id:'protetor',n:'Protetor solar',a:'Físico',min:'1x',ideal:'3x'},
- {id:'sabonete',n:'Sabonete facial',a:'Físico',min:'1x',ideal:'1x'},
- {id:'creme',n:'Creme noite',a:'Físico',min:'1x',ideal:'1x'},
- {id:'visual',n:'Visualizar objetivos e moti',a:'Pessoal',min:'1x',ideal:'—'},
- {id:'gingado',n:'Curso Destrave seu Gingado',a:'Pessoal',min:'1x',ideal:'1x'}
+ {id:'terco',n:'Terço',a:'Espiritual',min:'1x',ideal:'1x',pq:'Estado de graça habitual',gatilho:'Logo após o banho'},
+ {id:'rezaManha',n:'Rezas da manhã',a:'Espiritual',min:'1x',ideal:'—',pq:'Estado de graça habitual'},
+ {id:'rezaMeio',n:'Rezas do meio do dia',a:'Espiritual',min:'1x',ideal:'—',pq:'Estado de graça habitual'},
+ {id:'rezaNoite',n:'Rezas da noite',a:'Espiritual',min:'1x',ideal:'—',pq:'Estado de graça habitual'},
+ {id:'exame',n:'Exame de consciência',a:'Espiritual',min:'1x',ideal:'1x',pq:'Estado de graça habitual',gatilho:'Antes da caseína, 21:15'},
+ {id:'graca',n:'Em estado de graça',a:'Espiritual',min:'1x',ideal:'—',pq:'Dias seguidos em estado de graça: a sequência que mais importa'},
+ {id:'leitura',n:'Leitura',a:'Intelectual',min:'1h',ideal:'2h',pq:'Vida intelectual: livros com método. Bater o piso de 1h alimenta os dias seguidos em Objetivos',gatilho:'Kindle no metrô e no ônibus'},
+ {id:'interm',n:'Li em intermediários',a:'Intelectual',min:'1x',ideal:'—',nh:true,pq:'Metrô, ônibus, esperas: leitura, celular zero. N.H. em dia sem deslocamento nem espera'},
+ {id:'creatina',n:'Creatina 10 g',a:'Físico',min:'1x',ideal:'1x',pq:'Força e cognição'},
+ {id:'beta',n:'Beta-alanina 6 g',a:'Físico',min:'1 dose de 6 g',ideal:'3 doses de 2 g',pq:'Resistência na luta'},
+ {id:'multi',n:'Multivitamínico',a:'Físico',min:'1',ideal:'2',pq:'Base de saúde'},
+ {id:'mela',n:'Melatonina e pro sleep',a:'Físico',teto:true,min:'0 mg',ideal:'máx 1 mg + 1 pro sleep',pq:'Sono'},
+ {id:'cama',n:'Na cama até 21:45',a:'Físico',teto:true,min:'—',ideal:'21:45',pq:'7h30 de sono para acordar às 05:15'},
+ {id:'celquarto',n:'Dormir com despertador longe e arrumado',a:'Pessoal',min:'1x',ideal:'—',pq:'O celular vira despertador: longe da cama, carregando, arrumado, não companhia de madrugada'},
+ {id:'sol',n:'Sol ao longo do dia',a:'Físico',min:'10 min',ideal:'15 a 20 min com braços e pernas expostos',pq:'A vitamina D vem do UVB, que é forte perto do meio-dia: 15 a 20 min entre 10h e 15h, com braços e pernas de fora, bastam. Curto e frequente, sempre bem antes de avermelhar. Sol do fim de tarde quase não produz vitamina D, mas serve para humor e sono',gatilho:'Sair de casa logo após o banho'},
+ {id:'minox',n:'Minoxidil, 8 borrifadas',a:'Físico',min:'1x à noite',ideal:'—',pq:'Cabelo'},
+ {id:'dentes',n:'Escovar os dentes',a:'Físico',min:'2x',ideal:'após cada refeição',pq:'Dente saudável'},
+ {id:'fruta',n:'Fruta e vegetais',a:'Físico',min:'um pouco dos dois',ideal:'300 g + 300 g',pq:'Dieta e longevidade'},
+ {id:'agua',n:'Água',a:'Físico',min:'2,5 L',ideal:'4,5 L',pq:'Hidratação; sem refrigerante',gatilho:'Encher a garrafa ao levantar'},
+ {id:'dieta',n:'Segui a dieta',a:'Físico',min:'1x',ideal:'—',pq:'Alimenta os dias seguidos em Objetivos'},
+ {id:'plano',n:'Plano físico matinal',a:'Físico',min:'1x',ideal:'—',pq:'Vacuum, mewing, mobilidade, footwork: core, lombar e luta'},
+ {id:'alongamento',n:'Alongamento',a:'Físico',min:'1x',ideal:'1x',pq:'Flexibilidade e espacate. Alimenta os dias seguidos em Objetivos'},
+ {id:'naodeitar',n:'Não deitei de dia',a:'Físico',teto:true,min:'—',ideal:'sem deitar',pq:'Deitar de dia derruba o resto do dia. Alimenta os dias seguidos em Objetivos'},
+ {id:'postreino',n:'Pós-treino: direto ao banho, sem sentar',a:'Pessoal',min:'1x',ideal:'—',nh:true,espelho:'m3',pq:'Sem sentar, sem celular. N.H. em dia sem treino. Espelha a mortificação do exame'},
+ {id:'arranque',n:'Acordei, levantei, água no rosto, não voltei',a:'Pessoal',min:'1x',ideal:'—',pq:'Os primeiros 60 segundos: acordou, levantou, jogou água, não voltou pra cama. Alimenta os dias seguidos em Objetivos'},
+ {id:'pegada',n:'Fortalecimento de pegada',a:'Físico',min:'1x',ideal:'—',pq:'Handgrip. Alimenta os dias seguidos em Objetivos'},
+ {id:'protetor',n:'Protetor solar',a:'Físico',min:'1x',ideal:'3x',pq:'Rosto'},
+ {id:'sabonete',n:'Sabonete facial',a:'Físico',min:'1x',ideal:'1x',pq:'Rosto'},
+ {id:'creme',n:'Creme noite',a:'Físico',min:'1x',ideal:'1x',pq:'Rosto'},
+ {id:'visual',n:'Percorri o Manhã',a:'Pessoal',min:'1x',ideal:'—',pq:'Lembrar do que amo antes do dia começar'},
+ {id:'funcional',n:'Vida funcional hoje',a:'Pessoal',min:'1x',ideal:'—',pq:'Acordei e levantei na hora; não deitei de dia; não divaguei em coisas inúteis; fui ao Insper; cumpri os deveres da faculdade, da vida intelectual e da espiritual'},
+ {id:'extra',n:'Vida extraordinária hoje',a:'Pessoal',min:'1x',ideal:'—',pq:'Ocupei a mente com coisa bonita: a lista está no Manhã. Música boa, imagem bela, imaginário alimentado'}
 ];
 
 /* ==================================================================
    2. MÉTRICAS SEMANAIS
    ================================================================== */
 const SEMANAIS=[
- {id:'missa',n:'Missa',a:'Espiritual',min:1,ideal:1},
- {id:'cof',n:'COF',a:'Intelectual',min:1,ideal:2},
- {id:'ingcurso',n:'Inglês — curso',a:'Intelectual',min:3,ideal:5},
- {id:'musc',n:'Musculação',a:'Físico',min:2,ideal:4},
- {id:'calistenia',n:'Calistenia',a:'Físico',min:2,ideal:4},
- {id:'jiu',n:'Jiu-jitsu',a:'Físico',min:2,ideal:4},
- {id:'lutape',n:'Luta em pé',a:'Físico',min:2,ideal:4},
- {id:'sparring',n:'Sparring',a:'Físico',min:1,ideal:1},
- {id:'meia',n:'21 km',a:'Físico',min:0,ideal:1}
+ {id:'hardskill',n:'Blocos de hardskill',a:'Financeiro',tipo:'blocos',min:7,ideal:8,pq:'Copy, Python, Certificação em IA e Claude: o sustento futuro',
+   sub:[{id:'copy',n:'Copy'},{id:'prog',n:'Programação'},{id:'ia',n:'Certificação IA'},{id:'claude',n:'Claude'}]},
+ {id:'missa',n:'Missa',a:'Espiritual',min:1,ideal:1,pq:'Estado de graça habitual'},
+ {id:'cof',n:'COF, aulas assistidas',a:'Intelectual',min:1,ideal:1,pq:'Cada aula marcada aqui soma no contador de 585 em Objetivos'},
+ {id:'ingles',n:'Estudei inglês',a:'Intelectual',tipo:'escala',escala:['Nenhum','Pouco','Médio','Bem'],min:2,ideal:4,pq:'Quanto estudei de inglês esta semana. As aulas vistas você conta no objetivo, em Objetivos'},
+ {id:'matematica',n:'Matemática',a:'Intelectual',min:2,ideal:4,pq:'Agenda: dom, qui, sex, sáb'},
+ {id:'musc',n:'Musculação, com calistenia',a:'Físico',min:2,ideal:4,pq:'400 sessões. Agenda: dom, ter, qui, sáb'},
+ {id:'jiu',n:'Jiu-jitsu, com NOGI',a:'Físico',min:3,ideal:6,pq:'900 aulas. Agenda: seg x2 (EF e BlueFit), ter BlueFit, qua x2 (EF e BlueFit), sex NOGI'},
+ {id:'boxe',n:'Boxe',a:'Físico',min:2,ideal:4,pq:'600 aulas. Agenda: seg x2 (EF e Ibirapuera), qua x2 (EF e Ibirapuera)'},
+ {id:'muay',n:'Muay thai',a:'Físico',min:1,ideal:1,pq:'600 aulas. Agenda: sáb'},
+ {id:'mma',n:'MMA',a:'Físico',min:1,ideal:2,pq:'600 aulas. Agenda: dom, qui'},
+ {id:'sparring',n:'Sparring',a:'Físico',min:1,ideal:2,pq:'Campeonato. Agenda: qui EF, sáb'},
+ {id:'aerobico',n:'Aeróbico',a:'Físico',min:2,ideal:4,pq:'10 min pós-musculação. Agenda: junto das 4 musculações'}
 ];
-const AREAS=['Espiritual','Intelectual','Financeiro','Físico','Pessoal'];
-const PREFIX='painel-metricas:';
 
 /* ==================================================================
-   3. EXAME DE CONSCIENCIA
-   Respostas: 'sim' | 'nao' | 'nh' (nao houve ocasiao).
-   nh:true libera o terceiro botao. Sem nh, so Sim/Nao.
-   inv:true inverte a polaridade: nesse item, Nao e a resposta fiel.
-   Item nao respondido NAO conta como falta.
+   3. EXAME DE CONSCIÊNCIA
+   'sim' | 'nao' | 'nh'. inv:true inverte: Não é a resposta fiel.
    ================================================================== */
 const EXAME=[
- {id:'ancoras',t:'1 \u00b7 \u00c2ncoras do dia',sub:'N\u00e3o negoci\u00e1veis. Se algo aqui falhou, \u00e9 o prop\u00f3sito priorit\u00e1rio de amanh\u00e3.',itens:[
-   {id:'a1',q:'Acordei \u00e0s 05:15, sem pegar o celular?'},
-   {id:'a2',q:'Cumpri a reza da manh\u00e3 (Ter\u00e7o do dia, rezas do dia, medita\u00e7\u00e3o)?'},
-   {id:'a6',q:'Visualizei os objetivos e o moti do dia?'},
-   {id:'a3',q:'Mantive fechado o canal de contato com a ocasi\u00e3o pr\u00f3xima (notifica\u00e7\u00f5es, Discord)?'},
-   {id:'a4',q:'Treinei ou cumpri o m\u00ednimo f\u00edsico do dia?'},
-   {id:'a5',q:'Fui transparente hoje, sem omiss\u00e3o relevante com minha m\u00e3e ou comigo mesmo?'}
+ {id:'ancoras',t:'1 · Âncoras do dia',sub:'Não negociáveis. Se algo aqui falhou, é o propósito prioritário de amanhã.',itens:[
+   {id:'a1',q:'Levantei às 05:15 e fui direto ao banho, sem celular?'},
+   {id:'a2',q:'Cumpri a reza da manhã (Terço do dia, rezas do dia, meditação)?'},
+   {id:'a6',q:'Percorri o Manhã (objetivos e moti)?'},
+   {id:'a3',q:'Mantive fechado o canal de contato com a ocasião próxima (notificações, Discord)?'},
+   {id:'a4',q:'Treinei ou cumpri o mínimo físico do dia?'},
+   {id:'a5',q:'Fui transparente hoje, sem omissão relevante com minha mãe ou comigo mesmo?'}
  ]},
- {id:'revisao',t:'2 \u00b7 Revis\u00e3o r\u00e1pida do dia',
-   nota:'Percorra o dia em quatro blocos: manh\u00e3, tarde, noite, rela\u00e7\u00f5es. Onde fui fiel ao dever? Onde me perdi? Sem escrever: s\u00f3 percorrer, e levar o que aparecer para as se\u00e7\u00f5es abaixo.'},
- {id:'dever',t:'3.1 \u00b7 Dever de estado',sub:'Trabalho, estudo, ac\u00eddia.',itens:[
-   {id:'d1',q:'Cumpri o dever do dia (faculdade, estudo, farm\u00e1cia) sem negociar comigo mesmo?'},
+ {id:'revisao',t:'2 · Revisão rápida do dia',nota:'Percorra o dia em quatro blocos: manhã, tarde, noite, relações. Onde fui fiel ao dever? Onde me perdi? Sem escrever: só percorrer, e levar o que aparecer para as seções abaixo.'},
+ {id:'dever',t:'3.1 · Dever de estado',sub:'Trabalho, estudo, acídia.',itens:[
+   {id:'d1',q:'Cumpri o dever do dia (faculdade, estudo, farmácia) sem negociar comigo mesmo?'},
+   {id:'d5',q:'Fui à aula?',nh:true},
+   {id:'d9',q:'Fiz aulas de inglês nos intervalos da faculdade?',nh:true},
    {id:'d2',q:'Evitei ficar horas na cama ou procrastinar o que era prioridade?'},
    {id:'d3',q:'Usei o celular e as redes de forma medida, sem fuga compulsiva?'},
+   {id:'d7',q:'Consumi jogo, reels ou conteúdo de topo de funil fora dos intervalos de aula?',inv:true},
+   {id:'d8',q:'Joguei ou conversei com quem me tira do foco?',inv:true,nh:true},
+   {id:'d6',q:'Cedi a uma exigência do meio (sair, jogar, conversa inútil) contra o dever?',inv:true,nh:true},
    {id:'d4',q:'Evitei que Discord, amigos ou celular atrapalhassem o estudo e o trabalho?'}
  ]},
- {id:'castidade',t:'3.2 \u00b7 Castidade e pureza',itens:[
-   {id:'c1',q:'Evitei pornografia e masturba\u00e7\u00e3o?'},
+ {id:'castidade',t:'3.2 · Castidade e pureza',itens:[
+   {id:'c1',q:'Evitei pornografia e masturbação?'},
    {id:'c2',q:'Evitei olhares e fantasias buscadas deliberadamente (academia, rua, internet)?'},
-   {id:'c3',q:'Evitei flerte, conte\u00fado sexual ou conversas que alimentam o v\u00ednculo antigo?',nh:true},
-   {id:'c4',q:'Evitei m\u00fasica ou conte\u00fado com letra ou imagem obscena?'}
+   {id:'c3',q:'Evitei flerte, conteúdo sexual ou conversas que alimentam o vínculo antigo?',nh:true},
+   {id:'c4',q:'Evitei música ou conteúdo com letra ou imagem obscena?'}
  ]},
- {id:'caridade',t:'3.3 \u00b7 Caridade',sub:'M\u00e3e, fam\u00edlia, pr\u00f3ximo.',itens:[
-   {id:'k1',q:'Fui gentil e paciente com minha m\u00e3e e minha irm\u00e3, mesmo sob irrita\u00e7\u00e3o?',nh:true},
+ {id:'caridade',t:'3.3 · Caridade',sub:'Mãe, família, próximo.',itens:[
+   {id:'k1',q:'Fui gentil e paciente com minha mãe e minha irmã, mesmo sob irritação?',nh:true},
    {id:'k2',q:'Evitei alimentar rancor ou falar mal da ex-namorada?',nh:true},
-   {id:'k5',q:'Evitei verbalizar qualquer reclama\u00e7\u00e3o?'},
-   {id:'k3',q:'Evitei fofoca e julgamento duro de algu\u00e9m?',nh:true},
+   {id:'k5',q:'Evitei verbalizar qualquer reclamação?'},
+   {id:'k3',q:'Evitei fofoca e julgamento duro de alguém?',nh:true},
    {id:'k4',q:'Fui verdadeiro nas minhas palavras, sem mentiras, nem pequenas?'}
  ]},
- {id:'espiritual',t:'3.4 \u00b7 Vida espiritual',itens:[
-   {id:'e1',q:'Rezei al\u00e9m da \u00e2ncora da manh\u00e3 (ter\u00e7o, missa, leitura espiritual)?'},
-   {id:'e2',q:'Sexta-feira: cumpri a abstin\u00eancia de carne ou penit\u00eancia equivalente?',nh:true},
-   {id:'e3',q:'Busquei o estado de gra\u00e7a como meta real do dia, n\u00e3o como ideal abstrato?'}
+ {id:'espiritual',t:'3.4 · Vida espiritual',itens:[
+   {id:'e1',q:'Rezei além da âncora da manhã (terço, missa, leitura espiritual)?'},
+   {id:'e2',q:'Sexta-feira: cumpri a abstinência de carne ou penitência equivalente?',nh:true},
+   {id:'e3',q:'Busquei o estado de graça como meta real do dia, não como ideal abstrato?'}
  ]},
  {id:'COF',cof:true},
- {id:'intrusivos',t:'4 \u00b7 Pensamentos intrusivos contra Deus',
-   nota:'Pensamentos blasfemos s\u00fabitos e n\u00e3o desejados, que voc\u00ea n\u00e3o busca e dos quais tem nojo, n\u00e3o entram neste exame como pecado: s\u00e3o fen\u00f4meno intrusivo, n\u00e3o consentimento da vontade. N\u00e3o os liste todo dia; isso alimenta escr\u00fapulo, n\u00e3o contri\u00e7\u00e3o. S\u00f3 \u00e9 mat\u00e9ria de exame se houve consentimento deliberado e buscado \u2014 e essa \u00e9 a \u00fanica pergunta abaixo.',
-   itens:[
-   {id:'i1',q:'Alimentei conscientemente algum deles, consentindo de prop\u00f3sito?',inv:true,nh:true}
+ {id:'intrusivos',t:'4 · Pensamentos intrusivos contra Deus',
+   nota:'Pensamentos blasfemos súbitos e não desejados, que você não busca e dos quais tem nojo, não entram neste exame como pecado: são fenômeno intrusivo, não consentimento da vontade. Não os liste todo dia; isso alimenta escrúpulo, não contrição. Só é matéria de exame se houve consentimento deliberado e buscado, e essa é a única pergunta abaixo.',
+   itens:[{id:'i1',q:'Alimentei conscientemente algum deles, consentindo de propósito?',inv:true,nh:true}]},
+ {id:'mort',t:'5.1 · Mortificações fixas',itens:[
+   {id:'m1',q:'Sem celular ao acordar, antes da reza da manhã.'},
+   {id:'m2',q:'Sem celular durante as refeições.'},
+   {id:'m4',q:'Sem celular em intermediários, fora dos intervalos de aula.'},
+   {id:'m3',q:'Pós-treino: fui direto ao banho, sem sentar com o celular.',nh:true}
  ]},
- {id:'mort',t:'5.1 \u00b7 Mortifica\u00e7\u00f5es fixas',itens:[
-   {id:'m1',q:'Sem celular ao acordar, antes da reza da manh\u00e3.'},
-   {id:'m2',q:'Sem celular durante as refei\u00e7\u00f5es.'},
-   {id:'m3',q:'P\u00f3s-treino: fui direto ao banho, sem sentar com o celular.',nh:true}
+ {id:'virt',t:'5.2 · Virtudes-alvo',itens:[
+   {id:'v1',q:'Disciplina: comecei sem negociar.'},
+   {id:'v2',q:'Constância: retomei rápido ao cair.',nh:true},
+   {id:'v3',q:'Temperança: medida com telas e comida.'},
+   {id:'v4',q:'Fortaleza: aguentei o desconforto do dever.'},
+   {id:'v5',q:'Ao sentir ansiedade, agi em vez de deitar ou paralisar.',nh:true},
+   {id:'v7',q:'Embalei o dia desde a manhã, sem desembalar.'},
+   {id:'v6',q:'Alimentei a mente com conteúdo bom, sem ruminação.'}
  ]},
- {id:'virt',t:'5.2 \u00b7 Virtudes-alvo',itens:[
-   {id:'v1',q:'Disciplina \u2014 comecei sem negociar.'},
-   {id:'v2',q:'Const\u00e2ncia \u2014 retomei r\u00e1pido ao cair.',nh:true},
-   {id:'v3',q:'Temperan\u00e7a \u2014 medida com telas e comida.'},
-   {id:'v4',q:'Fortaleza \u2014 aguentei o desconforto do dever.'}
- ]},
- {id:'proposito',t:'6 \u00b7 Ant\u00eddoto-chave e prop\u00f3sito para amanh\u00e3',
-   nota:'Quando volto a fazer, vejo que amo. A a\u00e7\u00e3o precede o \u00e2nimo, n\u00e3o o contr\u00e1rio. N\u00e3o espere sentir vontade para come\u00e7ar: comece, e a vontade vem depois, como consequ\u00eancia do ato.',
-   itens:[
-   {id:'p1',q:'Defini um prop\u00f3sito s\u00f3, concreto e pequeno, para amanh\u00e3?'}
- ]},
- {id:'conclusao',t:'7 \u00b7 Conclus\u00e3o',itens:[
-   {id:'f1',q:'Fiz o Ato de Contri\u00e7\u00e3o, com dor real pelo pecado e prop\u00f3sito de emenda?'},
+ {id:'proposito',t:'6 · Antídoto-chave e propósito para amanhã',
+   nota:'Quando volto a fazer, vejo que amo. A ação precede o ânimo, não o contrário. Não espere sentir vontade para começar: comece, e a vontade vem depois, como consequência do ato.',
+   itens:[{id:'p1',q:'Defini um propósito só, concreto e pequeno, para amanhã?'}]},
+ {id:'conclusao',t:'7 · Conclusão',itens:[
+   {id:'f1',q:'Fiz o Ato de Contrição, com dor real pelo pecado e propósito de emenda?'},
    {id:'f2',q:'Rezei Pai-Nosso, Ave-Maria e Santo Anjo da Guarda?'}
- ],nota:'Se houve pecado grave, prop\u00f3sito firme de buscar a confiss\u00e3o antes de comungar.'}
+   ,{id:'f3',q:'Houve pecado grave? Então fiz o propósito firme de me confessar antes de comungar.',nh:true}
+ ]}
 ];
 
 /* ==================================================================
    4. REGRAS COF  <<<<<<  BLOCO ÚNICO A TROCAR TODO MÊS  >>>>>>
-   Troque o rótulo e as 15 regras. Mantenha o id de uma regra
-   se ela continuar valendo no mês seguinte: o histórico dela
-   continua. Id novo = regra nova, histórico começa do zero.
-   Formato do id: AAAA-MM-NN
    ================================================================== */
-const COF_ROTULO='agosto de 2026';
+const COF_ROTULO='setembro de 2026';
 const COF_REGRAS=[
- {id:'2026-08-01',t:'Cavar onde estou',
-  se:'eu me pegar buscando um problema mais amplo ou mais nobre que o que est\u00e1 na minha frente',
-  entao:'volto ao problema concreto do meu lugar e do meu momento'},
- {id:'2026-08-02',t:'Aceitar sem reclamar',
-  se:'algo acontecer contra a minha vontade, ou surgir dor, atraso ou chatice',
-  entao:'aceito sem obje\u00e7\u00e3o e rezo, em vez de reclamar'},
- {id:'2026-08-03',t:'Voto de pobreza em opini\u00e3o',
-  se:'me pedirem opini\u00e3o sobre algo que eu n\u00e3o investiguei',
-  entao:'digo que n\u00e3o sei, ou gradu\u00e1o: certeza, probabilidade, verossimilhan\u00e7a, mera possibilidade'},
- {id:'2026-08-04',t:'Fechar o tribunal interior',
-  se:'eu me pegar em discurso mental de acusa\u00e7\u00e3o e defesa sobre mim mesmo',
-  entao:'interrompo e entrego a Deus, em vez de ruminar'},
- {id:'2026-08-05',t:'N\u00e3o falar mal de ningu\u00e9m',
-  se:'a conversa virar fofoca ou ju\u00edzo sobre quem n\u00e3o est\u00e1 presente',
-  entao:'calo ou mudo de assunto'},
- {id:'2026-08-06',t:'Ignorar cr\u00edtica n\u00e3o pedida',
-  se:'eu receber cr\u00edtica que n\u00e3o pedi e que n\u00e3o vem de autoridade leg\u00edtima',
-  entao:'n\u00e3o respondo e n\u00e3o rumino'},
- {id:'2026-08-07',t:'Cumprir a obriga\u00e7\u00e3o, ainda que mal',
-  se:'eu quiser adiar um dever (aula, estudo, farm\u00e1cia, casa) alegando cansa\u00e7o ou outra prioridade',
-  entao:'cumpro assim mesmo, imperfeitamente, sem fugir'},
- {id:'2026-08-08',t:'Leitura executiva',
-  se:'eu abrir um livro de filosofia',
-  entao:'paro em cada unidade fechada at\u00e9 a frase virar percep\u00e7\u00e3o, e s\u00f3 ent\u00e3o avan\u00e7o'},
- {id:'2026-08-09',t:'Teto de duas horas de estudo formal',
-  se:'eu passar de duas horas de estudo formal (ler tomando nota para uma finalidade)',
-  entao:'troco para leitura livre, fic\u00e7\u00e3o ou m\u00fasica'},
- {id:'2026-08-10',t:'N\u00e3o calcular o que v\u00e3o pensar',
-  se:'eu me pegar calculando o que os outros v\u00e3o pensar antes de falar ou agir',
-  entao:'decido pelo que devo \u00e0 consci\u00eancia e a Deus, n\u00e3o pela aprova\u00e7\u00e3o'},
- {id:'2026-08-11',t:'Palavra com lastro',
-  se:'eu usar ou ouvir um termo abstrato sem exemplo concreto por tr\u00e1s',
-  entao:'exijo o exemplo real; se n\u00e3o houver, n\u00e3o uso a palavra'},
- {id:'2026-08-12',t:'N\u00e3o explicar a quem zomba',
-  se:'algu\u00e9m desdenhar ou zombar do que eu estudo',
-  entao:'n\u00e3o explico, n\u00e3o me justifico e sigo'},
- {id:'2026-08-13',t:'Reabsorver a circunst\u00e2ncia',
-  se:'aparecer um obst\u00e1culo que atrapalhe a rotina ou o plano',
-  entao:'pergunto como us\u00e1-lo a favor do fim, em vez de brigar com ele'},
- {id:'2026-08-14',t:'Repert\u00f3rio da minha ignor\u00e2ncia',
-  se:'eu topar com um termo, autor ou problema que n\u00e3o domino',
-  entao:'anoto na lista da minha ignor\u00e2ncia, em vez de fingir que sei'},
- {id:'2026-08-15',t:'Confiss\u00e3o noturna',
-  se:'eu deitar',
-  entao:'conto o dia como foi, sem exagerar nem atenuar, e nomeio um autoengano'}
+ {id:'cof-01',t:'Cavar onde estou',se:'eu me pegar buscando um problema mais amplo ou mais nobre que o que está na minha frente',entao:'volto ao problema concreto do meu lugar e do meu momento'},
+ {id:'cof-02',t:'Aceitar sem reclamar',se:'algo acontecer contra a minha vontade, ou surgir dor, atraso ou chatice',entao:'aceito sem objeção e rezo, em vez de reclamar'},
+ {id:'cof-03',t:'Voto de pobreza em opinião',se:'me pedirem opinião sobre algo que eu não investiguei',entao:'digo que não sei, ou graduo: certeza, probabilidade, verossimilhança, mera possibilidade'},
+ {id:'cof-04',t:'Fechar o tribunal interior',se:'eu me pegar em discurso mental de acusação e defesa sobre mim mesmo',entao:'interrompo e entrego a Deus, em vez de ruminar'},
+ {id:'cof-05',t:'Não falar mal de ninguém',se:'a conversa virar fofoca ou juízo sobre quem não está presente',entao:'calo ou mudo de assunto'},
+ {id:'cof-06',t:'Ignorar crítica não pedida',se:'eu receber crítica que não pedi e que não vem de autoridade legítima',entao:'não respondo e não rumino'},
+ {id:'cof-07',t:'Cumprir a obrigação, ainda que mal',se:'eu quiser adiar um dever (aula, estudo, farmácia, casa) alegando cansaço ou outra prioridade',entao:'cumpro assim mesmo, imperfeitamente, sem fugir'},
+ {id:'cof-08',t:'Leitura executiva',se:'eu abrir um livro de filosofia',entao:'paro em cada unidade fechada até a frase virar percepção, e só então avanço'},
+ {id:'cof-09',t:'Teto de duas horas de estudo formal',se:'eu passar de duas horas de estudo formal (ler tomando nota para uma finalidade)',entao:'troco para leitura livre, ficção ou música'},
+ {id:'cof-10',t:'Não calcular o que vão pensar',se:'eu me pegar calculando o que os outros vão pensar antes de falar ou agir',entao:'decido pelo que devo à consciência e a Deus, não pela aprovação'},
+ {id:'cof-11',t:'Palavra com lastro',se:'eu usar ou ouvir um termo abstrato sem exemplo concreto por trás',entao:'exijo o exemplo real; se não houver, não uso a palavra'},
+ {id:'cof-12',t:'Não explicar a quem zomba',se:'alguém desdenhar ou zombar do que eu estudo',entao:'não explico, não me justifico e sigo'},
+ {id:'cof-13',t:'Reabsorver a circunstância',se:'aparecer um obstáculo que atrapalhe a rotina ou o plano',entao:'pergunto como usá-lo a favor do fim, em vez de brigar com ele. Ortega: a reabsorção da circunstância é o destino concreto do homem'},
+ {id:'cof-14',t:'Repertório da minha ignorância',se:'eu topar com um termo, autor ou problema que não domino',entao:'anoto na lista da minha ignorância, em vez de fingir que sei'},
+ {id:'cof-15',t:'Confissão noturna',se:'eu deitar',entao:'conto o dia como foi, sem exagerar nem atenuar, e nomeio um autoengano'},
+ {id:'cof-16',t:'Recuperar a própria voz',se:'eu me pegar falando, escrevendo ou decidindo pela voz de outro, ou por um elemento antagônico que não é meu',entao:'volto à minha própria voz. Aula 4: o núcleo prático é descobrir os elementos antagônicos e alienantes que existem em mim e recuperar a minha voz'},
+ {id:'cof-17',t:'Momentos privilegiados, de Lavelle',se:'eu viver um momento em que o universo se ilumina e a vida revela o seu sentido',entao:'guardo a lembrança, faço reviver e transformo na trama do cotidiano, a morada habitual do meu espírito. Não deixo virar sonho frágil'},
+ {id:'cof-18',t:'Não inverter realidade e sonho',se:'a situação do momento me oprimir e parecer mais real que o meu mundo interior',entao:'lembro que a situação é fluida e passageira, e que ceder a ela é medo, não realismo. Não chamo de sonho o que me é mais íntimo e verdadeiro'},
+ {id:'cof-19',t:'O tribunal certo',se:'eu for julgar o que fiz ou o que penso',entao:'submeto ao tribunal dos sábios, os maiores que já pisaram aqui, e não à autoridade do meio em que estou. Acima deles, só Deus'},
+ {id:'cof-20',t:'Julgo eu primeiro',se:'eu terminar um trabalho meu',entao:'eu mesmo julgo primeiro. Se eu não sou capaz de julgar o meu trabalho, não há garantia de que os outros o julguem com honestidade'},
+ {id:'cof-21',t:'Arrependimento sim, remorso não',se:'eu me pegar remoendo o que já foi perdoado ou me arrependendo demais',entao:'corto. Remorso é demoníaco, porque o desespero profundo pressupõe condenação. O arrependimento autêntico tem esperança e alegria, e é moderado'},
+ {id:'cof-22',t:'Mostrar a Deus, não aos homens',se:'eu sentir vontade de expor os meus podres a alguém, ou de encenar arrependimento',entao:'mostro a Deus. Sincerismo exibicionista já é fingimento'},
+ {id:'cof-23',t:'Depois da morte não se muda mais',se:'eu for adiar algo que sei que devo fazer',entao:'lembro que a vida terá forma fechada e que depois de morrer não se muda mais. O necrológio é o juiz, e o prazo é hoje'},
+ {id:'cof-24',t:'O ideal não é código penal',se:'o meu eu ideal começar a funcionar como tribunal que me condena',entao:'volto a usá-lo como critério que orienta e eleva, não como sentença. Auto-imagem vira ratoeira quando o ideal vira código penal'},
+ {id:'cof-25',t:'Sem sacrifício inútil',se:'me pedirem, direta ou indiretamente, um sacrifício que só atende ao capricho alheio e atrapalha o meu dever e a minha rotina',entao:'recuso com serenidade. Caridade não é servidão à tolice dos outros'},
+ {id:'cof-26',t:'Bem feito mesmo sem gostar',se:'eu estiver num trabalho ou numa matéria de que não gosto',entao:'faço da melhor forma possível. O modo de fazer é meu, mesmo quando a tarefa não é'},
+ {id:'cof-27',t:'Ideias de náufrago',se:'eu for adotar uma ideia ou um discurso',entao:'pergunto se eu a sustentaria numa situação de vida ou morte. Ortega: as únicas ideias que valem são as dos náufragos'},
+ {id:'cof-28',t:'Senso do concreto',se:'eu raciocinar sobre um conceito',entao:'recomponho o elo entre a formulação e o objeto real. Sem isso é puro abstratismo'},
+ {id:'cof-29',t:'Perseverar no momento de luz',se:'a luz passar e eu voltar ao escuro',entao:'persevero assim mesmo, sob o critério da morte. A sabedoria está em fazer os momentos reviverem, não em esperar que voltem sozinhos'},
+ {id:'cof-30',t:'Vencer o advogado interior',se:'eu ouvir dentro de mim a voz que advoga a favor do mundo e contra mim',entao:'reconheço que o antagonismo já foi internalizado e venço essa voz. A batalha mais dura é contra o próprio instinto alienante'},
+ {id:'cof-31',t:'Medo e aprovação são o eixo de hoje',se:'eu for examinar por que fiz ou deixei de fazer algo',entao:'procuro primeiro medo e desejo de aprovação, não cobiça nem luxúria. Hoje são esses os dispersantes principais'},
+ {id:'cof-32',t:'Aceitar o destino, combater o alienante',se:'eu me revoltar contra a minha circunstância',entao:'aceito o destino como se eu mesmo o tivesse escolhido, e me oponho apenas aos elementos alienantes. O domínio da existência nasce do acordo íntimo com ela'},
+ {id:'cof-33',t:'Cortar quem pressiona contra o alto',se:'um amigo exercer sobre mim pressão de inveja, descrédito ou gozação por eu estudar e querer o alto',entao:'largo essa companhia. Trocar o mais elevado pelo amor de quem não vale nada é o pior dos negócios'},
+ {id:'cof-34',t:'Nenhum dever acima da consciência e de Deus',se:'a família, o emprego ou o grupo exigirem algo acima do que devo à consciência e a Deus',entao:'lembro que o sábado foi feito para o homem, e não o homem para o sábado'},
+ {id:'cof-35',t:'Não morrer como imbecil',se:'eu me acomodar ou fugir do que é digno',entao:'lembro Bernanos: o risco não é morrer, é morrer como imbecil. Há coisas que devo fazer para dignificar a minha vida no instante da morte'},
+ {id:'cof-36',t:'Ficção é sonho acordado dirigido',se:'eu ler ficção, ver um filme ou uma peça',entao:'entro de verdade na cena e me identifico com o personagem. Sem adestramento do imaginário, nada se pode fazer'},
+ {id:'cof-37',t:'Imitar para formar voz',se:'eu ler um autor de que gosto',entao:'tomo posse do estilo dele como instrumento: giros, vocabulário, sintaxe. Imitando vários é que se compõe arsenal próprio'},
+ {id:'cof-38',t:'Compreender antes de julgar',se:'eu for julgar alguém',entao:'tento compreendê-lo como ele mesmo se compreende, do genérico ao particular. Julgar por padrão que não se aplica ao caso é injustiça'},
+ {id:'cof-39',t:'Não ser peso: a primeira obrigação',se:'eu for adiar a questão do meu sustento, ou me acomodar por ainda ser sustentado',entao:'lembro que a primeira obrigação é não ser peso para os outros. Quem não se sustenta não vale nada, e quem acha que a sociedade tem obrigação de sustentá-lo é ladrão moral. Olavo é duro aqui de propósito: quem recusa esse dever nega o próprio ser moral'},
+ {id:'cof-40',t:'Dignidade do pior emprego',se:'o trabalho disponível for medíocre, chato ou abaixo do que eu queria',entao:'faço assim mesmo e tiro satisfação disso: o pior emprego, se sustenta, já é algo, porque deixei de pesar. E é essa satisfação que dá força para aguentar o emprego e ainda fazer o meu fora dele'},
+ {id:'cof-41',t:'Aproximar o esquema financeiro da vocação',se:'eu me vir preso entre o que pago as contas e o que é a minha vocação',entao:'não largo nenhum dos dois: trabalho para ir aproximando, com esforço sincero, o esquema financeiro da vocação verdadeira. O trabalho, o sustento e prover a família são parte integrante da vocação, não o oposto dela'},
+ {id:'cof-42',t:'O feijão e o sonho',se:'eu for opor o dever material ao que eu amo, como se um matasse o outro',entao:'lembro de Orígenes Lessa: a limitação externa não é só obstáculo, pode virar canal de realização. O erro não é ter sonho, é deixá-lo alienante por não sustentar o feijão'}
 ];
 /* ================= fim do bloco a trocar todo mês ================= */
+
+/* ==================================================================
+   5. OBJETIVOS
+   src: de onde vem a execução. sem = contador semanal; dia = métrica diária no piso ou acima;
+   hs = sub-contador de hardskill; exa = pergunta do exame com resposta fiel; manual = botões na tela.
+   total null = pendente, editável na tela. inicial = feito antes do app, editável.
+   ================================================================== */
+const FAIXAS=[{n:'Branca',ini:0,fim:150},{n:'Azul',ini:150,fim:350},{n:'Roxa',ini:350,fim:600},{n:'Marrom',ini:600,fim:900}];
+const OBJETIVOS=[
+ {id:'graca',a:'Espiritual',n:'Dias seguidos em estado de graça',modelo:'seq',seq:'graca',pq:'Você marca na aba Dia'},
+ {id:'oracao',a:'Espiritual',n:'Dias seguidos com terço e rezas',modelo:'seq',seq:'oracao',pq:'Terço no mínimo ou acima, e as três rezas do dia feitas: manhã, meio do dia e noite'},
+ {id:'jiu',a:'Físico',n:'Faixa preta',unid:'aulas',total:900,inicial:150,src:{tipo:'sem',id:'jiu'},modelo:'faixas',pq:'A cada 2 semanas seguidas sem aula, perde 1. Nunca abaixo do início da faixa'},
+ {id:'boxe',a:'Físico',n:'Boxe',unid:'aulas',total:600,inicial:0,src:{tipo:'sem',id:'boxe'},perda2sem:true,pq:'2 semanas seguidas sem aula, perde 1'},
+ {id:'muay',a:'Físico',n:'Muay thai',unid:'aulas',total:600,inicial:0,src:{tipo:'sem',id:'muay'},perda2sem:true,pq:'2 semanas seguidas sem aula, perde 1'},
+ {id:'mma',a:'Físico',n:'MMA',unid:'aulas',total:600,inicial:0,src:{tipo:'sem',id:'mma'},perda2sem:true,pq:'2 semanas seguidas sem aula, perde 1'},
+ {id:'sparring',a:'Físico',n:'Sparring',unid:'sparrings',total:180,inicial:0,src:{tipo:'sem',id:'sparring'},perda2sem:true,pq:'2 semanas seguidas sem sparring, perde 1'},
+ {id:'musc',a:'Físico',n:'Musculação',unid:'sessões',total:400,inicial:0,src:{tipo:'sem',id:'musc'}},
+ {id:'aerobico_seq',a:'Físico',n:'Semanas seguidas com pelo menos 2 aeróbicos',modelo:'seqsem',seqId:'aerobico',seqAlvo:2,pq:'Marque Aeróbico na aba Semana'},
+ {id:'cof',a:'Intelectual',n:'COF',unid:'aulas',total:585,inicial:39,src:{tipo:'sem',id:'cof'}},
+ {id:'ingles',a:'Intelectual',n:'Domínio do Inglês',unid:'itens',total:325,inicial:1,src:{tipo:'manual'},pq:'Some cada aula vista aqui, nos botões'},
+ {id:'insper',a:'Intelectual',n:'Dias de aula seguidos no Insper',modelo:'seq',seq:'insper',credito:1,pq:'Segunda a sexta, 2 aulas por dia. Fim de semana e N.H. não quebram a sequência'},
+ {id:'pegada_seq',a:'Físico',n:'Dias seguidos fazendo handgrip',modelo:'seq',seq:'pegada',pq:'Marque Fortalecimento de pegada na aba Dia'},
+ {id:'alongamento_seq',a:'Físico',n:'Dias com alongamento seguidos',modelo:'seq',seq:'alongamento',pq:'Marque Alongamento na aba Dia'},
+ {id:'creatina_seq',a:'Físico',n:'Dias com creatina tomada seguidos',modelo:'seq',seq:'creatina',pq:'Marque Creatina 10 g na aba Dia'},
+ {id:'beta_seq',a:'Físico',n:'Dias com beta-alanina tomada seguidos',modelo:'seq',seq:'beta',pq:'Marque Beta-alanina na aba Dia'},
+ {id:'naodeitar_seq',a:'Físico',n:'Dias sem deitar de dia seguidos',modelo:'seq',seq:'naodeitar',pq:'Marque Não deitei de dia na aba Dia'},
+ {id:'dieta_seq',a:'Físico',n:'Dias seguidos seguindo a dieta',modelo:'seq',seq:'dieta',pq:'Marque Segui a dieta na aba Dia'},
+ {id:'cerebro_seq',a:'Pessoal',n:'Dias seguidos educando o cérebro',modelo:'seq',seq:'cerebro',pq:'Ícaro: o cérebro aprende se você cumpre ou não. Só conta o dia em que TUDO do pacote básico foi cumprido: levantar, creatina, beta-alanina, alongamento, handgrip e aula. Um item falho quebra o dia'},
+ {id:'arranque_seq',a:'Pessoal',n:'Dias seguidos acordando, levantando, jogando água e não voltando',modelo:'seq',seq:'arranque',pq:'Marque Acordei, levantei, água no rosto, não voltei na aba Dia'},
+ {id:'postreino_seq',a:'Pessoal',n:'Dias seguidos sem enrolar no celular pós-treino',modelo:'seq',seq:'postreino',pq:'Marque na aba Dia ou no exame: os dois se espelham. Dia sem treino não quebra'},
+ {id:'banho_seq',a:'Pessoal',n:'Dias seguidos levantando e indo direto pro banho',modelo:'seq',seq:'banho',pq:'Responda a primeira pergunta do exame à noite'},
+ {id:'beleza_seq',a:'Pessoal',n:'Dias seguidos ocupando a mente com coisa bonita',modelo:'seq',seq:'beleza',pq:'Marque Vida extraordinária hoje na aba Dia'},
+ {id:'pureza_seq',a:'Espiritual',n:'Dias seguidos sem pornografia e masturbação',modelo:'seq',seq:'pureza',pq:'Responda a pergunta de castidade no exame à noite'},
+ {id:'missa_seq',a:'Espiritual',n:'Semanas seguidas sem faltar à missa',modelo:'seqmissa',pq:'Marque Missa na aba Semana'},
+ {id:'leitura1h_seq',a:'Intelectual',n:'Dias seguidos lendo pelo menos 1h',modelo:'seq',seq:'leitura1h',pq:'Cumprir o piso de 1h na Leitura, na aba Dia'},
+ {id:'certia',a:'Financeiro',n:'Certificação em IA',unid:'módulos',total:4,inicial:1,src:{tipo:'manual'}},
+ {id:'copy',a:'Financeiro',n:'Certificação em Copy',unid:'módulos',total:23,inicial:1,src:{tipo:'manual'},pq:'17 módulos e 6 bônus'},
+ {id:'python',a:'Financeiro',n:'Python do Zero',unid:'módulos',total:11,inicial:1,src:{tipo:'manual'}},
+ {id:'cl_dom',a:'Financeiro',n:'Claude',unid:'módulos',total:2,inicial:0,src:{tipo:'manual'}},
+ {id:'cl_cowork',a:'Financeiro',n:'Claude Cowork',unid:'módulos',total:3,inicial:0,src:{tipo:'manual'}},
+ {id:'cl_code',a:'Financeiro',n:'Claude Code',unid:'módulos',total:10,inicial:0,src:{tipo:'manual'}},
+ {id:'cl_meta',a:'Financeiro',n:'Claude + Meta Ads',unid:'módulos',total:2,inicial:0,src:{tipo:'manual'}},
+ {id:'cl_web',a:'Financeiro',n:'Claude + Webdesign',unid:'módulos',total:5,inicial:0,src:{tipo:'manual'}},
+ {id:'cl_video',a:'Financeiro',n:'Claude + Edição de vídeo',unid:'módulos',total:7,inicial:0,src:{tipo:'manual'}}
+];
+
+/* ==================================================================
+   6. MANHÃ: conteúdo por etiqueta. Chaves suas, não texto expandido.
+   Você pode acrescentar itens dentro do app (ficam no backup).
+   ================================================================== */
+/* Primeiros gestos do dia, na ordem. Fixo no topo da manhã, não entra em rotação. */
+/* Tática da manhã, versão final. Checklist do dia, zera sozinho a cada dia. */
+/* Item opcional: {t:'...',opc:true}. Não entra no total do anel. */
+const TATICA=[
+ ['Noite anterior',[
+   'Alarmy armado no celular, celular longe da cama, fora do alcance do braço',
+   'Café pronto e montado no quarto',
+   'Toalha arrumada para o banho',
+   'Roupa de treino separada fora do quarto',
+   'Janela e cortina abertas',
+   'QR code colado na cozinha',
+   {t:'Áudio do Padre Paulo Ricardo com timer de 1h',opc:true},
+   {t:'Cafeína 1h30 antes do horário de acordar',opc:true}
+ ]],
+ ['No alarme',[
+   'Alarmy toca',
+   'Sem soneca',
+   'Pés no chão em cinco segundos'
+ ]],
+ ['Pós alarme',[
+   'Acender todas as luzes',
+   'Fazer os scanners e desligar o alarme',
+   'Tomar o café'
+ ]],
+ ['Banheiro',[
+   'Banho'
+ ]],
+ ['De volta ao quarto',[
+   'Levantar o colchão',
+   'Sentar na cadeira',
+   'Preencher o app de métricas, que abre automaticamente'
+ ]],
+ ['Depois',[
+   'Ler tudo o que o app traz na aba Manhã (abertura, motis, história, imagine que...), com calma, entrando em cada cena',
+   'Cumprir a rotina da manhã'
+ ]]
+];
+const ARRANQUE=['Desliga o alarme','Café','Água','Virar o colchão','Rotina matinal'];
+/* Primeira coisa da manhã, antes de qualquer número. Fixo. */
+const ABERTURA=[
+ 'Tudo o que você ler e imaginar aqui: faça com detalhes, se transporte para lá.',
+ 'Tudo coopera para o bem daqueles que amam a Deus. E hoje eu estarei em graça.',
+ 'Objetivo: desenvolver personalidade, virtudes, caráter e a melhor liberdade possível.',
+ 'Ícaro: seu cérebro aprende que você promete e não faz, e já sabe de início se você vai fazer ou não. Se você educá-lo a entender que sempre que promete você cumpre, isso muda tudo.',
+ 'Não abandone os ideais altíssimos e exigentes. Eles não são exagero nem fase: são a essência do Matheus desde sempre.',
+ 'Ser o melhor em tudo. Usar os talentos que recebi e amá-los: isso é meu desde menino, e continua meu agora.',
+ 'Hoje a vontade está fraca, mas quando eu voltar a amá-los, vou me arrepender amargamente de não ter feito. Então faça agora, mesmo sem sentir.'
+];
+/* História natural de desenvolvimento. Fixa na manhã, não entra em rotação: é o eixo, não um item entre outros. */
+/* Fixo na manhã. O estado neutro é o mais perigoso: sem hype e sem depressão, a mente subestima o dever e negocia. */
+/* O que está do outro lado do foco sem ressalvas. Fixo: a mente não estima isso sozinha. */
+const PERDENDO=[
+ 'Não faço ideia do tamanho do que está do outro lado de focar sem ressalva. A mente não consegue estimar isso, então subestima.',
+ 'A vida do Ícaro: trabalho que é meu, sistema meu, ninguém mandando em mim.',
+ 'A casa da Samira: campo, espaço, a família dentro, o que quero desde os 12 anos.',
+ 'Jogar GTA VI em paz, num sábado, com tudo cumprido e nada pesando.',
+ 'A sensação do Ícaro aos 18: cheio de hardskill, olhando o mundo e vendo que dá para empreender em mil coisas.',
+ 'As felicidades que nem sei nomear ainda, porque nunca cheguei lá para ver.',
+ 'A vida pode ter muita sensação diferente, e eu não imagino o que estou perdendo. Só estar em Itajubá já era diferente. Imagine mil coisas, seguir sonhos...',
+ 'Cada dia com ressalva é um dia comprado de volta pelo Matheus que não vai ter isso.'
+];
+/* Eu já sei o mapa. Fixo na manhã: o problema nunca foi falta de informação. */
+const MAPA=[
+ 'Eu sei o mapa da vida e de como dar certo. Sei desde meados de 2022: catolicismo, luta, musculação, estudo, trabalho, virtude, sono, dieta.',
+ 'Não falta descobrir mais nada. Não falta um curso novo, um método novo, uma explicação nova.',
+ 'Falta cumprir o que eu já sei que é certo desde pequeno. É execução, não conhecimento.',
+ 'Chegar aos 25 com a vida no lugar depende disso, e só disso.',
+ 'Já decidi. Agora obedeça.'
+];
+const CONFIE=[
+ 'Esqueço o tanto de problema que a rotina vai me poupar. Ela não é peso: é o que evita a dor que eu já conheço.',
+ 'Não estou sentindo o hype de antes, o de ver uma estante cheia de livro ou uma luta de MMA e querer tudo. Também não estou na depressão de antes. É esse meio-termo que me faz subestimar e não cumprir.',
+ 'Sem hype e sem dor, a mente diz que hoje pode passar. É mentira do estado, não leitura do dever.',
+ 'Já pensei, já decidi, já escrevi. Hoje é só executar: não reabra a decisão no dia.',
+ 'Faça, e confie.'
+];
+/* Resumo fixo, lido antes da linha do tempo. */
+const HISTORIA_RESUMO='Em 2019, com 14 anos, eu queria fazer hapkido 2x por semana. E fiz. Dos 15 aos 18 parei. Em 2023 fui voltar e não voltei. Estou muito frustrado, porque poderia ter sido muito: eu já queria isso aos 14. Não perca mais tempo, senão o fim é triste.';
+/* A outra linha do tempo: a da procrastinação. Fixa, ao lado da história. */
+const PROCRASTINACAO_ABERTURA='A procrastinação está destruindo a minha vida. Não é uma fase: é uma linha do tempo própria, e ela corre desde os 14.';
+const PROCRASTINACAO=[
+ ['2019','Já procrastinei o IoT. Percebi ali, aos 14 anos.'],
+ ['2020','Viver de Renda, do Perini: procrastinei o módulo final, justamente o de marketing digital.'],
+ ['2021','Procrastinei a faculdade.'],
+ ['2022','Procrastinei redação, Enem e escola, tudo até o último dia. Cheguei a comprar um curso sobre isso.'],
+ ['2023','Procrastinei tudo: COF, BJJ, o resto.'],
+ ['O saldo','Procrastinação, falta de ordem e disciplina e distração estão destruindo a minha vida. E lá se vão mais de 7 anos.']
+];
+const HISTORIA=[
+ ['até 2016','Antivírus. Já queria entender a máquina por dentro.'],
+ ['2017','Celulares. E a casa da Samira: IoT, carregador sem fio na mesa, organizador de fio. Queria isso desde os 12.'],
+ ['2018','Curso de hardware da Chipart.'],
+ ['2019','Quis me aprofundar e poder criar: curso de desenvolvimento de games, engine, curso de IoT, livro de IA. Projeto de automação na escola. Luta e calistenia. Comecei a ver investimentos e quantitative investing. E já identifiquei ali, no IoT, que o problema era procrastinação.'],
+ ['2020','Curso de Python, para entender tecnologia por dentro. Conheci marketing digital, copy e tráfego. StartSe.'],
+ ['2021','Psicologia, seducão, antropologia, Sexy Canvas. Virada para o conservadorismo moral.'],
+ ['2022','Em janeiro, comprei um curso contra procrastinação: já sabia o diagnóstico e fui atrás do remédio. Olavo. Vida intelectual. Jiu-jitsu.'],
+ ['2023','Católico. COF. Era o ano de aplicar tudo.'],
+ ['Onde isso ia dar','Muita hardskill, muito dinheiro (copy, marketing, lançamento, IA, agência com IA) e muita virtude. Era o desenvolvimento natural, com felicidade natural junto.'],
+ ['O ponto','Essa foi a minha história de desenvolvimento e de felicidade natural. Volte a ser o Matheus de 2017 a 2022: aquele já sabia o caminho e ia por vontade própria.'],
+ ['O que isso prova','Identifiquei a procrastinação em 2019 e fui atrás dela em 2022. Não é falta de diagnóstico nem de método: é execução. O que resolve não é estudar mais o problema, é cumprir o dia.']
+];
+const AFIRMACOES=[
+ 'Só existe felicidade no cumprimento do dever.',
+ 'Só estou sem vontade pela depressão de 2024. Vou deixar a imaturidade da Madu pautar minha vida?',
+ 'Conheci Olavo, Dr. Jorge e Ícaro aos 17. Quando vou começar a viver seguindo os ensinamentos deles?',
+ 'Sou homem e tenho 21 anos. Vou ficar deitado? Vou faltar por irresponsabilidade?',
+ 'Hoje devo levar a sério o meu sonho. O dever é agora, com ou sem vontade.',
+ 'Focar agora é para habituar, sair da depressão, conquistar e voltar à sensação da casa da Samira.',
+ 'Perseverar no dever nos dias ruins é o que me deixa inteiro para os dias bons.',
+ 'Siga a cartilha do Lucas Maia.',
+ 'Quero maestria máxima. Em tudo o que entrou na agenda.',
+ 'Necrológio: viver por ele. Frankl: sentido e dignidade nas circunstâncias que tenho.',
+ 'Fazer tudo por Deus, com vista à eternidade.',
+ 'Hoje: um propósito só, concreto e pequeno.',
+ 'A imensidão do que quero dominar pede que eu comece agora, não que eu me assuste.',
+ 'Embalar no dia é bom, não desgastante. Desembalar arruína o dia inteiro.',
+ 'Imagine se eu der o meu máximo hoje, sem procrastinar nada: onde eu chegaria em 5 anos?',
+ 'Ler as regras de manhã dá força para cumprir: o plano já está feito, é só seguir.',
+ 'Se és morno, vomitar-te-ei.',
+ 'Rezar para ter força e tirar a preguiça. Deus me sustenta.',
+ 'Dar o máximo em tudo, do protetor solar ao método de estudo.',
+ 'Acordar e ir atrás dos meus objetivos com o entusiasmo com que eu acordava para jogar quando era menor.',
+ 'Sonho sem rotina é delírio. Confiar na rotina: cada bloco tem um porquê já pensado.',
+ 'Começa hoje, pelo piso.'
+];
+const MOTI=[
+ {t:'Espiritual',k:'Balize tudo pela eternidade. Alegre-se por estar amigo de Deus, vivendo a verdade, em busca do Céu.'},
+ {t:'Espiritual',k:'O vazio de Deus é muito maior que qualquer coisa besta.'},
+ {t:'Espiritual',k:'O trabalho santifica. A quem muito foi dado, muito será cobrado.'},
+ {t:'Espiritual',k:'Juízo Particular: Deus quer que eu fique vendo reels?'},
+ {t:'Espiritual',k:'A carne quer prazer, mas o espírito clama por sentido.'},
+ {t:'Espiritual',k:'Fábio Salgado reacende catolicismo e vida de estudos. Dr. Jorge reacende VSM, vida espiritual e simbolismo.'},
+ {t:'Intelectual',k:'Aos 15 anos, Fábio Salgado de Carvalho já tinha lido Homero, Virgílio, Ésquilo, Sófocles, Cervantes, Camões, Goethe e quase toda a coleção Os Pensadores: leitura era rotina diária, não meta de fim de semana.'},
+ {t:'Intelectual',k:'Olavo de Carvalho dizia que 3 horas de estudo por dia, feitas todo santo dia, bastam: mais que isso não rende, constância vale mais que volume.'},
+ {t:'Intelectual',k:'Olavo de Carvalho dizia que um intelectual deve ler no mínimo 70 livros por ano, e que ele mesmo ultrapassava essa marca com folga.'},
+ {t:'Intelectual',k:'Deyvid Antônio se descreve como estudioso de toda matéria e publica análises sérias de filosofia com regularidade: disciplina de produção constante, não só de leitura avulsa.'},
+ {t:'Espiritual',k:'A Eucaristia é o eixo civilizacional. O sacramento é o que mais importa.'},
+ {t:'Espiritual',k:'Engajar nos Acólitos.'},
+ {t:'Combate',k:'Entender e combater as ideologias anticristãs: progressismo, feminismo radical, marxismo, globalismo. A indignação vira combustível de estudo, não de xingamento: sem repertório eu não refuto nada.'},
+ {t:'Combate',k:'Origem do vírus: internamente, a hipótese de manipulação em laboratório era discutida como real por virologistas de primeira linha, enquanto em público era rotulada de teoria da conspiração. Está nos e-mails divulgados; a origem em si segue em disputa. Lição: checar a fonte antes de aceitar o consenso oficial.'},
+ {t:'Combate',k:'Declaração de Great Barrington: os autores foram alvo de uma campanha para desmoralizá-los, como mostram e-mails internos do NIH. Discordar de política pública não pode custar a carreira de um cientista.'},
+ {t:'Combate',k:'Lockdowns: os modelos de letalidade que justificaram medidas extremas erraram por larga margem, e depois houve negação pública do apoio dado a essas políticas. Exigir o dado, não a manchete.'},
+ {t:'Combate',k:'Censura: usar a máquina pública para calar o crítico é confissão de que não se tem argumento. Meu papel é ter argumento.'},
+ {t:'Combate',k:'Marcuse e as estratégias revolucionárias; os casos soviéticos; a tese de que sem Estado há caos e os contraexemplos. Saber responder, com fonte.'},
+ {t:'Combate',k:'A Igreja construiu hospitais, universidades e escolas. Quem me acusa raramente sabe disso. Eu preciso saber.'},
+ {t:'Combate',k:'Odiar a fraqueza e a mentira. A resposta é competência: estudo, treino, trabalho.'},
+ {t:'Intelectual',k:'Deividy Antônio estuda 4h por dia, todo dia, pela vida intelectual.'},
+ {t:'Intelectual',k:'COF e Olavo: o êxtase do texto. Sempre que leio, quero mais.'},
+ {t:'Intelectual',k:'Kogos sobre economia e sobre o marxismo: o repertório de quem estudou.'},
+ {t:'Intelectual',k:'Fugita falando de escolástica. Grenzi: cosmologia.'},
+ {t:'Intelectual',k:'Fábio Salgado: matemática e física; entender teses avançadas e desenvolver teses sérias.'},
+ {t:'Intelectual',k:'Deivid Pansera: física, história, simbolismo, método de estudo, inglês por filmes.'},
+ {t:'Intelectual',k:'Mario Ferreira dos Santos: personalidade humana e simbólica. Wolfgang Smith: patrística, física, matemática e filosofia.'},
+ {t:'Intelectual',k:'Natália Sulman: análise literária. Débora Luciano e o pólo norte: estudo.'},
+ {t:'Intelectual',k:'Olavo, aula 51: você é o maior impeditivo. Arrume isso.'},
+ {t:'Intelectual',k:'Olavo lendo Stendhal por obrigação e Freud completo. Olavo não deixava amigo atrapalhar.'},
+ {t:'Intelectual',k:'Olavo sobre o inconsciente adaptativo: desenvolvi isso há tempos; é gostoso: estude.'},
+ {t:'Intelectual',k:'Studium do Murillo; a formação do imaginário. Símbolo Faltante. As 12 camadas da CIM.'},
+ {t:'Intelectual',k:'Falcón, De Paola, Gonzaga, Silveira: sabedoria e erudição na mesma pessoa. Quero competir com os grandes.'},
+ {t:'Intelectual',k:'Thomas Giuliano e a live A vingança de Aristóteles.'},
+ {t:'Intelectual',k:'Platão, Aristóteles e Agostinho falam de coisas que nem imagino que falariam.'},
+ {t:'Intelectual',k:'Ver o que Riemann pensou sem calculadora. Entender como a calculadora, o PC e o trem funcionam.'},
+ {t:'Intelectual',k:'Mises escrevendo Ação Humana. Jim Simons. O analista que criou a gramática do tupi.'},
+ {t:'Intelectual',k:'O full na estatística funcionou; o flow antes da prova.'},
+ {t:'Intelectual',k:'Simbolismo junguiano nos contos de fada. Design da Paulus. Torlay.'},
+ {t:'Intelectual',k:'Oppenheimer: física. Over the Garden Wall: imaginário.'},
+ {t:'Intelectual',k:'Unir IA e física para ajudar a criar cura de doenças.'},
+ {t:'Intelectual',k:'Os grandes não perdiam tempo no celular. Ítalo tem vício em ler.'},
+ {t:'Luta',k:'Mica Galvão ganhando o absoluto em 40 segundos em New Jersey.'},
+ {t:'Luta',k:'Mica Galvão: prefiro uma hora de treino com qualidade a três horas só repetindo. Não é o tanto de horas, é a intensidade de cada uma.'},
+ {t:'Luta',k:'O ringue da Corner no Itaim, Team Lira: bandeiras na parede, gente treinando de manhã. É para lá que eu vou.'},
+ {t:'Luta',k:'Charles do Bronx começou o jiu-jitsu aos 12 anos, com o irmão, por recomendação médica após uma doença. Treinava em academias simples no Guarujá, sem estrutura nenhuma, e não parou.'},
+ {t:'Luta',k:'Paulo Miyao: treino jiu-jitsu duas vezes por dia e faço preparação física três vezes por semana. Ele e o irmão chegaram a dormir na própria academia.'},
+ {t:'Luta',k:'Khabib Nurmagomedov treinava de 2 a 3 sessões por dia, com um treino sempre pela manhã, todos os dias, desde criança nas montanhas do Daguestão.'},
+ {t:'Luta',k:'Rickson Gracie dedicava 2 horas por dia à respiração, meditação e visualização, além do treino físico: preparava a mente com o mesmo rigor que preparava o corpo.'},
+ {t:'Luta',k:'Ruotolo campeão de MMA aos 23.'},
+ {t:'Luta',k:'Pantoja era entregador de iFood.'},
+ {t:'Luta',k:'Poatan: o shape e a disciplina. Aquela vez que vi e voltei a me entusiasmar.'},
+ {t:'Luta',k:'Daghestão: treino de pescoço todo dia. Khabib. Makhachev. Chimaev.'},
+ {t:'Luta',k:'Adesanya. Jon Jones e Ferguson: o mood. Mike Tyson. Demetrious.'},
+ {t:'Luta',k:'Creed. Kratos clipado: treino e força.'},
+ {t:'Luta',k:'Arona. O pessoal do MMA que começou tarde e chegou.'},
+ {t:'Luta',k:'22 anos no UFC dando pirueta e chutando lindo. Mattei chutando alto a raquete.'},
+ {t:'Luta',k:'Lucas Maia como cornerman do filho.'},
+ {t:'Luta',k:'A emoção do Boga em 2023. Eu e o Pedro vendo luta e hypando. Lutar com o Pedro: a felicidade masculina.'},
+ {t:'Luta',k:'Moti Miguel. Chico contando a escada.'},
+ {t:'Luta',k:'O entusiasmo de quando eu treinava freestyle e imaginava aplicando nos jogos.'},
+ {t:'Shape',k:'Ganley: wake wake. Bitelo: força. Cbum. Ramon Dino. Alfredo. Leandro Twin. Muzy.'},
+ {t:'Shape',k:'Energia Xandão indo para a academia. Léo Stronda gritando.'},
+ {t:'Shape',k:'Breier: mood focadão. Wendell, Eslen, Max: estilo e lifestyle.'},
+ {t:'Shape',k:'Eu lançando a calistenia na chácara com autoestima alta.'},
+ {t:'Shape',k:'Treino consolidado já aconteceu uma vez com o shape. A capacidade existe.'},
+ {t:'Shape',k:'Fúria: só é feliz quem aprende com os erros e aplica.'},
+ {t:'Shape',k:'A rotina do Jocko Willink. Goggins e Ramon para treinar e lutar.'},
+ {t:'Cursos',k:'Wendell faturando milhares por dia em 2021.'},
+ {t:'Cursos',k:'A copy do Ícaro. A copy que o Claude fez e eu gostei.'},
+ {t:'Cursos',k:'Lucas Lancaster. Victorelli. CIM: marketing.'},
+ {t:'Cursos',k:'Formação em Copy, Sigmoidal, O Novo Mercado, O Investidor Essencial: olhe o tanto de cursos. Se delicie.'},
+ {t:'Cursos',k:'MFS do Epis.talk. Os cursos do Fúria.'},
+ {t:'Cursos',k:'Ramon no barco a vela. O moti engenharia do Insta.'},
+ {t:'Cursos',k:'Engenharia militar. Domo de Ferro. Ciência e engenharia militar.'},
+ {t:'Cursos',k:'Boris Cherny. CEOs de Nvidia, Qualcomm, Intel, Anthropic, OpenAI, Microsoft, Google, Tesla, BYD. O da Qualcomm fez Unicamp.'},
+ {t:'Cursos',k:'Steve Jobs. Elon Musk: dominar certas coisas me dará poder de criar coisas.'},
+ {t:'Cursos',k:'Brainstar: a máquina. Carebox: a máquina. Vi e senti que amo engenharia.'},
+ {t:'Cursos',k:'Carlos Melo: tecnologia, IA, IoT. DLSS, Google Duplex, CES, Qualcomm.'},
+ {t:'Cursos',k:'Criar coisas: barco a vapor, IoT, antenas, sequenciar genoma, IA. Kinect, RD Station, Insider One: dá para criar.'},
+ {t:'Cursos',k:'Me redescobri com os empreendimentos de IA na farmácia: fiquei muito feliz e hypado com as possibilidades.'},
+ {t:'Cursos',k:'Estudei um dia inteiro para Python. A capacidade existe. Python: dá.'},
+ {t:'Financeiro',k:'Ícaro trabalhando 8h sem parar, 12h por dia, sem feriado. A maior referência.'},
+ {t:'Financeiro',k:'Ícaro de Carvalho prega e pratica o trabalho depois do trabalho: cumprir o que é dos outros de dia, e construir o que é seu à noite.'},
+ {t:'Financeiro',k:'Ícaro de Carvalho batizou o próprio método de Venda Todo Santo Dia: vender e aparecer todos os dias, sem exceção, é o eixo do negócio dele.'},
+ {t:'Financeiro',k:'Antes de ficar rico, Ícaro de Carvalho trabalhava como freelancer: criava sites e escrevia textos para empresas, cliente por cliente, até fundar O Novo Mercado.'},
+ {t:'Financeiro',k:'Wendell Carvalho resume assim: a rotina certa resolve dias que a motivação nunca conseguiria sustentar.'},
+ {t:'Financeiro',k:'Aos 18 anos, Carlos Melo saiu de casa pela primeira vez para morar sozinho e estudar para a Academia da Força Aérea. Anos depois, virou cientista de dados autodidata e fundou o Sigmoidal.'},
+ {t:'Financeiro',k:'Warren Buffett lê cerca de 500 páginas por dia, 5 a 6 horas entre jornais, relatórios e livros: é assim que o conhecimento se acumula, como juros compostos.'},
+ {t:'Financeiro',k:'Ícaro comendo japa em casa. Ícaro na procissão. Ícaro sobre Dalrymple.'},
+ {t:'Financeiro',k:'Lucas Maia: a vida e a cartilha. Eslen. Victor Vitoreli.'},
+ {t:'Financeiro',k:'Chico recebendo. PLR. Pedro e a farmácia. Quando trabalhei com o Chico e o Pedro, vi que queria.'},
+ {t:'Financeiro',k:'Dividendos pagando todas as contas fixas. Renda passiva.'},
+ {t:'Financeiro',k:'Felipe Miranda e Empiricus: investir. Diego Aguiar: cripto. Metalnomics, Renato 38, Delfino, Grilo, Finch: dinheiro jovem.'},
+ {t:'Financeiro',k:'Ver uma caminhonete com luz e sentir o quanto quero. O mesmo com o apartamento.'},
+ {t:'Financeiro',k:'Ter dinheiro para pedir uma mulher em casamento, sustentar família e ser confiante.'},
+ {t:'Psicológico',k:'Kratos: a fúria de conquistar. Acorde com ela. Belisarius: postura de força. Ícaro: protetor.'},
+ {t:'Psicológico',k:'Tenente Breno. PQD do UFC. Iron Man.'},
+ {t:'Psicológico',k:'Lucas Maia, 05:44 no relógio, aula do Olavo aberta na tela: sonho sem rotina é delírio.'},
+ {t:'Psicológico',k:'Energia Xandão na esteira, imaginando o campeonato de boxe. A grama do Battlefield.'},
+ {t:'Psicológico',k:'Free From Desire ao acordar. Playlists: Zelda, Tolkien, São Tomás, AC Odyssey.'},
+ {t:'Psicológico',k:'Aos 24 anos, David Goggins pesava 135 kg. Perdeu 45 kg em 90 dias, treinando todo santo dia, pra se qualificar aos Navy SEALs.'},
+ {t:'Psicológico',k:'Jocko Willink acorda entre 4h30 e 4h45 todos os dias, sem exceção, e vai direto pro treino: 4 dias de divisão, sem negociar com o corpo.'},
+ {t:'Psicológico',k:'Mood: cowboy, cristão, lutador, espartano. Rei do castelo, rainha do lar.'},
+ {t:'Psicológico',k:'Sou intelectual, atleta, católico, logo ajo como tal. Um intelectual fica jogando Clash?'},
+ {t:'Psicológico',k:'Rivaldo de bicicleta. Ronaldinho de falta. Top Gun: vigor.'},
+ {t:'Psicológico',k:'Vídeos de santos: que alegria.'},
+ {t:'Psicológico',k:'Presença, masculino, fala com o peito, olhar no olho, dicção. Postura imponente.'},
+ {t:'Relacionamentos',k:'Perto dos amigos esqueço as coisas ruins. Senso de humor: Chico, Juninho, crias. Não esquecer disso.'},
+ {t:'Relacionamentos',k:'Um irmão de batalha: conversar, caminhar junto.'},
+ {t:'Relacionamentos',k:'Ao conhecer uma mulher, já estar preparado: cultura, presença, vida ordenada. Copini: viking e chama.'},
+ {t:'Relacionamentos',k:'A filha dizendo: papai, você é o melhor papai do mundo, tenho saudade sua.'},
+ {t:'Sacrifício',k:'Pedro salvando a família com a farmácia.'},
+ {t:'Sacrifício',k:'Huly cuidando do irmão. Os angolanos.'},
+ {t:'Sacrifício',k:'Marvadin: 50 minutos até Itajubá para dar aula às 6h.'},
+ {t:'Sacrifício',k:'O moleque do ITA aos 14 estudando 9h. Pierce estudando aos 13.'},
+ {t:'Sacrifício',k:'Aquino não tinha distrações. Eu tenho. Isso pede mais de mim, não menos.'},
+ {t:'Sacrifício',k:'Colombo se pôs num barco por Deus.'},
+ {t:'Frase-âncora',k:'Somente quem tem clareza de ideal chega aonde deveria. Melk.'},
+ {t:'Frase-âncora',k:'O homem sem tentações vira máquina de pensar. Nougué.'},
+ {t:'Frase-âncora',k:'Instale-se na vida concreta projetando o futuro, e os traumas se integrarão como força. Ítalo.'},
+ {t:'Frase-âncora',k:'Tudo o que faço é para construir algo sólido, não castelos de areia. Cado Tavares.'},
+ {t:'Frase-âncora',k:'A sabedoria consiste em salvaguardar a lembrança dos momentos privilegiados, fazê-los reviver e deles fazer a trama da existência cotidiana. Lavelle.'},
+ {t:'Frase-âncora',k:'Se tenho objetivos, devo persegui-los com garra. Ícaro Lerman.'},
+ {t:'Frase-âncora',k:'A disciplina resolve 99% dos meus problemas. As 6 áreas formam a rotina de um homem.'}
+];
+const NECROLOGIO=[
+ 'Estou seguindo minha vocação de forma completa ou desperdiçando?',
+ 'Se eu morresse hoje, o que estaria escrito? Viva por esse texto, não pela aprovação dos outros.',
+ 'Morrer como imbecil é o único fracasso sem correção depois. O de hoje tem correção: é o próximo ato.',
+ 'A quem muito foi dado, muito será cobrado. Deus me deu talento, corpo e capacidade.',
+ 'O verdadeiro legado são as almas dos filhos no céu e a família inteira.',
+ 'Balize tudo pela eternidade: o que eu faria agora se soubesse que o juízo é amanhã?',
+ 'Viemos sozinhos ao mundo e sozinhos morreremos. Levo o que fiz com o que me foi dado.',
+ 'Construir algo que fique para a posteridade: um livro, um curso, um negócio, uma família.',
+ 'A morte é certa e a hora é incerta. Hoje é o dia que tenho.'
+];
+const PAI=[
+ 'Honrar meu pai: ele abriu a farmácia sozinho e construiu o que sustenta a família até hoje.',
+ 'Frango assado e castelo com o pai. Jogar bola com o pai, o futebol de quinta.',
+ 'O abraço que eu podia ter dado naquele dia em que ele ficou bravo. Dar hoje o que ficou por dar: presença a quem está vivo.',
+ 'Um Pai-Nosso pela alma dele antes de sair de casa.',
+ 'A morte é certa e não avisa. O tempo é curto; o dever é hoje. Memento mori em chave de esperança, nunca de chicote.',
+ 'Pedro segurou a farmácia quando meu pai morreu. Sacrifício se faz calado. O meu é levantar e cumprir.',
+ 'Seria injusto com Deus, que me deu a vida e os talentos, e com os pais que me criaram, desperdiçar isso.'
+];
+const SONHOS=[
+ 'A casa do Leandro Ladeira ao entardecer: gramado grande, piscina, o filho brincando com o cachorro, a esposa por perto. Eu moro na casa dos meus sonhos.',
+ 'Eu aos 30: encaminhado, em paz, provendo. Novinho ainda, com grana, orgulho da família, viajando tudo pago, brabo em todas as áreas, com altíssimo poder de escolha. E o caminho começou hoje.',
+ 'Espiritual aos 30: em estado de graça, amigo de Deus, vivendo a verdade, em busca do Céu; o trabalho santificando.',
+ 'Intelectual aos 30: COF concluído; trivium e quadrivium; matemática e física; memória treinada; inglês fluente; 50 páginas por dia; lendo Platão, Aristóteles e Agostinho; escrita forte; competindo com os grandes.',
+ 'Financeiro aos 30: Python, IA, copy, Excel, edição, tráfego e investimento; negócio escalável rodando; restaurante e mercado sem olhar preço; casa com IoT; nadando na piscina de manhã, já rico.',
+ 'Físico aos 30: shape do Alfredo e do Ramon; calistenia na chácara; jiu e boxe avançados, a caminho da faixa preta; o futebol do Ronaldinho nas resenhas.',
+ 'Relacionamentos aos 30: esposa católica; filhos crescendo; comprar sushi quando ela pede; viajar em família; o filho dizendo papai, você é o melhor; os amigos de sempre por perto.',
+ 'Pessoal aos 30: focado, sem celular à toa; disciplina instalada; convicções formadas; a envergadura intelectual do Olavo com a presença de um Iron Man.',
+ 'Estação dos 25, no meio do caminho: COF em ritmo de conclusão; investimento, programação, IA, copy, Excel, edição, jiu, boxe, calistenia, inglês, trivium e quadrivium em curso.',
+ 'Nada disso é fantasia: passei no Insper, aguento 6 horas de prova, já estudei um dia inteiro de Python, já construí shape uma vez. A mente subestima o que sou capaz. Me dê dez anos.',
+ 'Dia ideal: a cafeteira prepara o café, vejo a lista, treino boxe com vista, o dividendo cai e paga tudo, vou ao sparring, ela compra japonês, chego em casa em paz.',
+ 'Nadar na piscina aquecida de manhã ouvindo música; treinar no Itaguara às 9h, tranquilo.',
+ 'Casa da Samira com campo de futebol; ver os filhos treinarem; futebol no condomínio todo fim de semana.',
+ 'AP em Riviera, pedindo iFood, dormindo tranquilo porque está tudo encaminhado.',
+ 'Casa com pedras. Casa medieval com passagem secreta. Casa IoT com ecossistema Samsung, geladeira IoT e o setup.',
+ 'Ir ao ICC com o filho de manhã, suave. Ser cornerman dele.',
+ 'Criar filhos sem tela, com tempo, com formação do imaginário. Esposa católica que quer se desenvolver junto.',
+ 'Dar casa a alguém. Dar 400 a quem pede e vê-lo feliz. Dinheiro para o irmão quando precisar.',
+ 'Carro blindado novo. Caminhonete. Mercedes. Lancha com o Breier. Chácara com o Chico, tudo pago com a minha grana.',
+ 'Viver só de dividendos. Um milhão. Prover: condomínio, escola boa, plano de saúde.',
+ 'Tailândia. Egito e as civilizações antigas. Morar nos EUA com o Ícaro. Igrejas e campos verdes. Ubatuba no fim de ano, PVZ, o de sempre.',
+ 'Barbado, bonito, tanquinho, faixa roxa, bom de boxe, ganhando online com marketing e IA.',
+ 'Capacidade técnica para empreender: criar soluções, como o Ícaro criou a Vigília.',
+ 'A paz da criança ao fazer tudo certo: Mario Kart de manhã, sabendo que vou conquistar o mundo.',
+ 'Bustos de intelectuais. Cantinho, malas, livros, perfumes: o meu lugar no mundo.',
+ 'Entusiasmos detalhistas a reconquistar: antebraço e abdômen definidos; QI alto; renda passiva; casa com IoT; suplementação e dieta completas; estilo, perfume, roupa; zerar um jogo; skincare.'
+];
+const SENSACOES=[
+ 'Eu e o Juninho falando tocou, toca pra quem sabe, lá no Itaguara. Aquela felicidade natural, sem motivo nenhum.',
+ 'Piscina do ICC; basquete no ICC; ir ao ICC de manhã. Tobogã gigante. Aniversários de criança.',
+ 'Disney em 2020. Parque aquático e resort: Beach Park, Tauá.',
+ 'Colônia de férias; futebol no campo. O sol.',
+ 'Praia jogando PVZ; a disparervilha azul de gelo em Ubatuba. Mar e PVZ.',
+ 'Apartamento das Torres Riviera, na piscina. Piscina azul da casa da avó, a tiguta. Quintal com totó.',
+ 'Buffet de chocolate: parecia outra pessoa. A dimensão lúdica azul da infância: pureza e visão holística.',
+ 'Rolês de 2020; casa do Guimassa. Quando me mudei para SP, comprava kiwi. William embrazado e feliz em 2020.',
+ 'Zoeiras: ímpar ou par; expressões faciais; fingir chute; bater a bola no bíceps; as zueras com o Juninho.',
+ 'Invadindo a mansão ouvindo Hungria. Saídas de 2017 no centro. Festas com as infantas.',
+ 'Garagem do Chico, water boy; caminhar com o Chico; brincar de arma com o Chico. Paraty com amigos.',
+ 'Discord e CS com os crias; call com amigos. Mario Kart Wii; Bedwars e Prison no Minecraft; fazer textura.',
+ 'Jogo de corrida no PSP; Backyardigans; jogar em paz. Sonic no PSP, fase da tartaruga.',
+ 'Aparecida com os crias: Deus me deu tudo. Funk com os amigos.',
+ 'Jogar bola na casa antiga, no campo de areia, durante as festas. Bola e freestyle na chácara. Bola na hípica.',
+ 'Praia, sol, andar em Guaratinguetá. Muito feliz no Replago. 2016 em Ubatuba ouvindo Hungria e vendo o DNA.',
+ 'Peixe com banana na beira da praia com a Vitorinha.',
+ 'Avô. Sensação de família na luta, na Naja. Andar com a família na rua de tijolos.',
+ 'Aeroporto de Guarulhos com a família para marcar viagem. Ubatuba com a família; a lavanderia de Ubatuba.',
+ 'Montar PC e hardware; reviews de PC. Comprar o próprio PC, GTX 950 e i3-6100: a felicidade de manjar de tecnologia.',
+ 'Celulares e interfaces antigas: LG no RJ em 2019, Galaxy A7 e A8, Note 8. Montando o PC em 2016.',
+ 'GTA ouvindo MC Don Juan no prédio, sentindo-me seguro. O Xbox chegando. PS4 com a luz azul. Fantasia do Batman e do Homem-Aranha.',
+ 'A chama reacendida na roça; vigor na fazenda, 2017 e 2024, com o Rapha. Correndo descalço, o chinelo que saiu, o flow.',
+ 'O lapso ao chegar do metrô: cinco segundos de felicidade, conversando com Deus.',
+ 'Empolgação com jogo à noite; a noite da lanterna; o entusiasmo de ir.',
+ 'Andar a cavalo; correr livre; jogar bola de manhã no sol; sair de bike; nadar. Churrasco.',
+ 'Ler em 2023 o tomo 1 da história da filosofia do Copleston em casa. A sensação de estudar CIM. Grécia antiga em 2022.',
+ 'A sensação de ter algo a mais, uma missão.',
+ 'Inteligência premiada na escola; olimpíadas. Lutar com o Pedro: a felicidade masculina. O ringue da academia, ICC 2.0.',
+ 'Entrar em carro chique em 2024. Mercedes blindada na formatura do Pedro. BYD com a mãe do Boga. A caminhonete da mãe.',
+ 'Ir trabalhar na farmácia: sensação nova. Flow antes da prova de estatística. Ler de manhã em São Paulo.',
+ 'Cartas de Cristo; O Segredo Além do Jardim. Textos do Olavo: o êxtase. Super Lives Séries.',
+ 'Arquitetura e padaria bonita perto da avó; Outback. Cheiro de piscina, Riviera, Eslen.',
+ 'Ambiente grego e natureza; velho oeste, RDR2; Zelda; AC Odyssey. Mar, viagens de navio, sabedoria celta.',
+ 'Correr, driblar e fazer o gol. Carrinho e pulo no gol no Fred. Garagem do Ferraz. Boxe contra o Ferraz: acertava sem pensar.',
+ 'Loja da Samsung. Mercado Shibata. Café da manhã de hotel.',
+ 'Na casa da vó em 2023 com o livro de estatística novo, em paz, à frente, sabendo que daria certo. Lendo filosofia em casa em 2023. Tatuapé 2023.',
+ 'Falando de simbólica com o Fish. Torlay sobre Platão. Daniel Scherer em janeiro de 2024.',
+ 'Be My Baby na esteira, meio dançando. Catholic lo-fi estudando. Para Nossa Alegria. Over the Garden Wall. Velozes e Furiosos 7. Top Gun.',
+ 'Rua do Pasin, 5 de dezembro. Rua do Pasin com bíceps. Ouvindo 7lx. Posta de skate marrom, perfume, a quadra.',
+ 'Aeroporto pós-Fortaleza: o perfume, a vontade de me cuidar. Casa do William em 2020. Esperando na frente do Yázigi.',
+ 'Hípica com o Chico, onírico. Kanyon esculpido em pedra. Cuisine Royale.',
+ 'Wedel em 2021. Ícaro em 2023. StartSe em 2020. IoT em 2019. Oppenheimer em 2023.'
+];
+/* Ocupar a mente com coisa bonita. Lista aberta: acrescente em Ver tudo. */
+const BELEZA=[
+ 'História de São Francisco de Assis.',
+ 'O vídeo de conversão do Majesty of Reason.',
+ 'A tradição do muay thai: o ritual, o respeito, o wai kru.',
+ 'Lugares bonitos do Oriente: os cenários de Zelda, os templos, a paisagem.',
+ 'Grécia: a luz, o mar, a pedra, o lugar onde a filosofia nasceu.',
+ 'Reels da Camila na montanha-russa da neve.',
+ 'O vídeo do Lito que mandei pro Godoi.',
+ 'Pinturas bonitas: parar de verdade diante de uma e olhar.',
+ 'Histórias de santas.',
+ 'Catedrais góticas: um povo inteiro construindo por 200 anos algo que não veria pronto.',
+ 'Música sacra: canto gregoriano, polifonia.',
+ 'Céu limpo, campo verde, água: a criação sem tela no meio.'
+];
+const ILUMINACOES=[
+ 'Fazenda em 2024, sentindo a felicidade de criança.',
+ 'Voltando do metrô e conversando com Deus.',
+ 'Algumas vezes em novembro.',
+ 'Eu e o Fish falando sobre simbolismo nos contos de fada.',
+ 'Antes da prova de estatística.',
+ 'Sonho com VNS. Brainstar: vendo a máquina, vi que amo aquilo. Carebox: a máquina.',
+ 'Treino de jiu com o Ramon e academia, 08/08: voltei e vi que amo.',
+ 'Be My Baby na esteira: a sensação subindo no corpo.',
+ 'Quando desanimado: já me entusiasmei com cada área várias vezes. O entusiasmo volta depois do ato. Basta ter o moti à mão.'
+];
+const EMERGENTISMO=[
+ 'Estou vivendo jogando a vida fora: vendo reels, e deixando de ir atrás dos meus objetivos para estudar para uma faculdade com a qual não quero trabalhar, que a IA vai substituir e que sozinho eu faria melhor. No lugar de treinar, ler e estudar o que importa.',
+ 'Em 2019, com 14 anos, eu queria fazer hapkido 2x por semana, todo dia. E fiz. Dos 15 aos 18 parei. Em 2023 fui voltar e não voltei. Poderia ter sido muito, e eu já queria isso aos 14. Não perca mais tempo: o fim é triste.',
+ 'Conheci Olavo, Dr. Jorge e Ícaro aos 17. Quando é que eu vou começar a viver seguindo os ensinamentos deles? Augusto Olivieri, aos 23, postando no Instagram, ficou rico.',
+ 'Mil livros diferentes, cursos de mil temas: matemática, física, teologia, copy, IA, luta. O volume é grande demais para ser vencido em surto. Só cai com aplicação massiva e diária.',
+ 'Não dá para pegar tudo isso fazendo pouco. A conta só fecha se eu aplicar todo dia, por anos.',
+ '3h de leitura por dia são 21h na semana, 90h no mês, 1095h no ano.',
+ '2 anos bem feitos já ajudam demais. Se eu focar agora, em 2028 terei 2 anos feitos.',
+ 'Meta: 2028,5.',
+ 'Cada dia sem estudo é um dia em que eu poderia ter aprendido algo. A cada dia que dou o meu máximo, mais perto dos meus sonhos.',
+ 'Conquistas trazem autoestima. Se eu começar a triunfar, o entusiasmo volta. Autoestima vem de conquista pequena registrada, que vem do piso cumprido.',
+ 'Provar ao meu cérebro que consigo, porque aí eu motivo. Se a mente tem certeza de que vou fazer, o corpo coopera.',
+ 'Fazer o melhor com as circunstâncias que Deus me dá, agora. Kanya, Frankl, Ortega, Lavelle.',
+ 'Lei da maestria: quanto mais fizer, melhor o inconsciente fica. Fazer de forma obsessiva.',
+ 'Imagine a rotina de alguém na fronteira: resolve o enigma do ITA, faz o movimento no jiu.',
+ 'Ledger de precocidade, face prospectiva: hardware e celular aos 8; Windows aos 8; olimpíadas ganhas; IoT desde 2018; startups em 2020; Ícaro, CIM e Ítalo em 2021; COF em 2022; ONM em 2023; IA há 6 anos. Capacidade comprovada: posso de novo. Começar cedo compõe juros, olhando para a frente.',
+ 'IA desde 2017, tráfego e copy desde 2020, Python 2020, jiu 2022, Olavo 2022. O itinerário é gigante e eu engatinhei. Hoje conta.',
+ '2023, 2024, 2025 e meio de 2026 parados. Os próximos 2 anos mudam o placar: 5 perdidos, 2 feitos.',
+ 'Aos 12, IA. Aos 15, dinheiro e academia. Aos 17, COF e catolicismo. Tenho 21. Que eu comece já: começar pequeno agora. Não é agora ou nunca; é agora.',
+ 'Insper: 3 anos e meio sem lutar o que podia, 7 meses equivalentes. A partir de hoje, toda semana conta.',
+ 'Em 2023 parei de trabalhar e estudar por causa do namoro. Em 2024 a depressão tirou o resto. Nunca mais entregar a vida a uma relação.',
+ 'Ela virou meu tudo porque eu não tinha mais nada meu. Recuperar o que é meu: luta, COF, livros, trabalho. Aí ela deixa de ser o centro.',
+ 'Terminei para dotar a vida de sentido, ir atrás dos objetivos e me unir a Deus. Se eu não fizer isso, o término não valeu.',
+ 'O que já foi, já foi. O que importa é o máximo que consigo a partir de agora.',
+ 'Objetivo em 1 ano: dominar Python. Quando eu estiver trabalhando, vou me arrepender de ter perdido tempo: então faça agora.'
+];
+const ANTINEUROSE=[
+ 'A sensação geral da vida pode mudar muito, e muitas vezes. Quanto mais eu focar agora, full, mais vou na direção de ela mudar.',
+ 'Eu esqueci dos meus objetivos e do quanto é bom ser feliz. Hoje eu procrastino, fico deitado e perco tempo porque esqueci deles. Se aquilo não tivesse acontecido, eu estaria focado fazendo tudo. Então faça.',
+ 'Só estou sem vontade por causa da depressão de 2024. Vou deixar a imaturidade da Madu pautar a minha vida?',
+ 'Não é que eu não queira. É a depressão de 2024 ainda falando. A falta de vontade tem causa e tem data: não é a minha natureza.',
+ 'Vou deixar o que aconteceu em 2024 pautar a minha vida inteira? A escolha de hoje é minha, não dela.',
+ 'Todos os meus desejos e a minha vocação continuam aí, mesmo por baixo da tristeza. Não sumiram, e sempre voltam.',
+ 'Aquele Matheus da casa da Samira está aí dentro, inteiro. Não morreu, só está coberto.',
+ 'Então faça. Depois vou desejar ter feito, e vou ser feliz por ter feito.',
+ 'A ação precede o ânimo. Espero a mágica do ânimo voltar para começar, mas ela só volta depois de um tempo fazendo o que devo.',
+ 'Depois que faço, vejo que valeu e era só ter feito. Quando começo a estudar, vejo que é fácil.',
+ 'A motivação vai e volta, mas sempre volta. O que importa é a constância. A solução é estrutural, não anímica.',
+ 'Preguiça é temporária. Quando vou, vejo que amo e que não devo parar.',
+ 'Acordo desmotivado. Banho, sol depois das 7h30, música e exercício resolvem. Sair de casa no sol revigora.',
+ 'Deitado e parado piora; ao embalar, flui; a preguiça se retroalimenta. O período de adaptação é o mais difícil; depois embala.',
+ 'O mecanismo real do fracasso são as micro-exceções, não a grande queda. As pequenas quedinhas me ferram: por isso o piso.',
+ 'Crença limitante: não vou conseguir ser disciplinado, nunca mais serei feliz. Contrária: vou ainda ser feliz e forte.',
+ 'Não confiar na emoção do momento: ela mente. Não querer é estado patológico, não verdade; no estado normal eu queria fazer tudo.',
+ 'Sempre esquecemos a intensidade, tanto do sofrimento quanto da felicidade. Nunca tirar a esperança nem a lembrança da dimensão da felicidade.',
+ 'Mesmo que perca a noção da grandeza dos cursos, confie: é uma imensidão.',
+ 'Pare de olhar para o negativo; a visão pode estar estreita. Olhe a imensidão do mundo.',
+ 'A felicidade basal fazia o viver ser bom por si, e ela pode voltar.',
+ 'Quando sentir raiva dela: ninguém me deve nada; eu só devo a Deus. Não seja carente.',
+ 'Eu nunca precisei dela para ser feliz. Quando estou muito bem, o que amo é focar em outras coisas; nem penso mais nela. Basta ela sair do centro.',
+ 'O sofrimento no término vinha de ego, validação, vício, hábito, medo de escassez e esquecimento dos meus objetivos, não de amor.',
+ 'Padrão a desabituar: ceder o próprio dever para não desagradar, e depois ressentir.',
+ 'Deus quer nossa salvação, não nossa alegria. Se precisar nos fazer sofrer para salvar, fará.',
+ 'Em tudo dai graças: extrair de cada momento a felicidade que Deus dá.',
+ 'Felicidade não se busca; encontra-se no que está diante dos olhos. Pode ter formato de cruz.',
+ 'Grato e impotente: a gratidão traz Cristo à realidade; a impotência tira o ego e deixa o Espírito agir.',
+ 'Perder a fé metastática: se eu fizer tudo certo, serei feliz? Não necessariamente. Não é aí que ela está.',
+ 'Afasta de mim este cálice, mas seja feita a Tua vontade.',
+ 'Desespero é falta de fé. Deus não permitiria um mal do qual não pudesse tirar um bem maior.',
+ 'Alegria interior atrai os anjos; a mágoa atrai os demônios.',
+ 'O ordinário bem feito e com amor é dever; não sofrer pelo ordinário nem desprezá-lo. O hábito torna fácil o que hoje é difícil.',
+ 'Nunca deixar o desânimo me abater: ele enfraquece. Música, sol, felicidade normal.',
+ 'Pensamento negativo o tempo todo é contraproducente. Inundar a mente com conteúdo bom.',
+ 'Esses momentos horríveis passam. Sempre passam.',
+ 'Estou isolado, fico dependente, e por isso sofro: a causa é a falta de rede de amigos, não defeito de essência.',
+ 'Funciono melhor em tranquilidade: quando a ansiedade some, eu faço. A melhor sensação é a paz. Fósforo, não fogueira.',
+ 'Não deixar o trauma me definir. Fazer como se estivesse em 2023, feliz.',
+ 'Começar aos 21 não é atraso. Que eu comece já não é agora ou nunca: o já saudável mira o início; o já tóxico ameaça com o fim.',
+ 'Disciplina é liberdade: automatizar o que antes custava esforço. Constância acima de intensidade: pouco todo dia vale mais que muito de vez em quando.',
+ 'Vontade é um músculo; tudo é treinável. Quanto mais escolho o certo, mais se fortalece a parte do cérebro ligada à vontade. Regra dos 40 por cento.',
+ 'Escada da virtude: começar, constância, hábito, virtude, felicidade frequente. A recompensa também é de curto prazo: o comprometimento gera felicidade agora.',
+ 'Externalizar a motivação na rotina: confiar na rotina que tem muito motivo por trás. Não preciso me remotivar toda hora; já pensei e já era.',
+ 'Melhorar em relação a critérios objetivos meus, não em relação a alguém. A lacuna entre o que sei e o que aplico se fecha com uma ação, não com um veredito sobre mim.',
+ 'A falha pontual nunca vira então não sou homem ou intelectual: isso é rótulo global, distorção.',
+ 'Não sou esse Matheus triste e sem autoestima; sou aquele que sabe que é inteligente e tem mil ideias.',
+ 'Quero viver, conquistar coisas, ver o mar, ser feliz com amigos.',
+ 'Tudo é sistêmico: trabalho, disciplina, dinheiro, confiança, relacionamento. Leitura, imaginário, memória, personalidade, escrita. Sono e dopamina, foco, estudo. Sacramentos e oração, paz, constância, todas as áreas. Ação, ânimo, mais ação: a alavanca-mestra.',
+ 'Só muda com atitude drástica: promessas semanais não funcionam. O que funciona é o piso cumprido hoje.',
+ 'Encarar o sofrimento como oportunidade de fazer o certo mesmo sofrendo, e de treinar a vontade.',
+ 'Meu problema não é falta de sabedoria, talento ou tempo: é acesso. Os antídotos existem; ficam soterrados. Este painel existe para colocá-los à mão no momento certo.',
+ 'O ciclo do esquecimento afetivo: bem, lembro o quanto amo; mal, esqueço a grandeza e só vejo o ruim; reencontro o conteúdo e re-sinto. Vejo vídeo de X e fico hypado para X. Basta ter o moti à mão.'
+];
+const APRENDIZADOS=[
+ 'Ceder meus objetivos para não ofender os outros me faz mal. Aprendi da pior forma.',
+ 'Desembalar e ficar devagar no dia arruína o dia todo.',
+ 'A beleza faz falta.',
+ 'Esqueço o quanto amo as coisas quando estou mal. Ao lembrar, a validação dela deixa de importar.',
+ 'Só é feliz quem aprende com os erros e aplica.',
+ 'Não demorar para tomar decisões.',
+ 'Fico em artigos e vídeos e não leio livros sistematicamente. Atenção sustentada se treina.',
+ 'Acumulo notas e cursos e nunca aplico. Acumular para depois custa mais do que fazer agora.',
+ 'Depois de tanto tempo deprimido, habituei agir como deprimido. Desabituar.',
+ 'Se mentiu uma vez, sem segunda chance.',
+ 'Erros nomeados: esperar virtude da outra pessoa; descontar raiva, que sempre piora o meu lado.',
+ 'O problema é execução e acesso, não conhecimento: tenho as ferramentas; é só fazer.',
+ 'Lembrar do poder da imaginação na motivação: na esteira, na grama do Battlefield, na energia do Xandão, nos sonhos.',
+ 'Entrar no mindset antes da tarefa: um estado para a academia, outro para o estudo. Ritual pré-estudo e pré-treino.',
+ 'Bens materiais são bens úteis: meios para fins elevados, não fins.'
+];
+const REGRAS=[
+ 'Não ver pornografia. Não ouvir música com letra obscena.',
+ 'Não estudar com o celular por perto. Blocos cronometrados, sem checar celular no intervalo.',
+ 'Não comer ultraprocessado nem besteira. Sem refrigerante. Desabituar açúcar aos poucos.',
+ 'Não deitar de dia. Pós-treino: direto ao banho.',
+ 'Celular: não no banheiro, não nas refeições, não nos treinos, não em intermediários.',
+ 'Não verbalizar reclamação.',
+ 'Não relativizar a rotina: antes vou jantar não vale. Não interromper a rotina por terceiros: ninguém.',
+ 'Não abrir Instagram antes das 11h. Bloquear os aplicativos por horário nos blocos de estudo.',
+ 'Não criar novos documentos nem anotações inúteis.',
+ 'Levantar imediatamente, ficar em pé, desligar o alarme, água no rosto, banho, sol.',
+ 'Ver a rotina da semana no domingo.',
+ 'Postura: nunca curvado, peito aberto, falar com o tórax, olhar no olho.',
+ 'Trabalho depois do trabalho. Quanto antes, melhor.',
+ 'Só gastar tempo com coisa sólida.',
+ 'Não sacrificar vida e sonhos por mulher ou carência. Não interromper a rotina por terceiros: ninguém.',
+ 'Nada contrário à vocação intelectual.',
+ 'Não me adaptar à mediocridade do meio. Não trocar o bem superior por eles.',
+ 'Levantar imediatamente, ficar em pé, desligar o alarme e ir direto ao banho. Água no rosto. Sol.',
+ 'Dormir com despertador longe e arrumado. Na cama às 21:45. Mesmo horário todo dia, independente do estado. Escuro antes de dormir.',
+ 'Reels e WhatsApp só nos intervalos de aula. Nos outros intermediários: leitura. Sem Instagram antes das 11h.',
+ 'Sem celular no banheiro, nas refeições, nos treinos, nos intermediários. Não estudar com o celular por perto.',
+ 'Não jogar. Não jogar com quem me tira do foco.',
+ 'Encher a garrafa ao levantar.',
+ 'Não relativizar a rotina: antes vou jantar não vale.',
+ 'Não verbalizar reclamação.',
+ 'Não deitar de dia. Pós-treino: direto ao banho, sem sentar com o celular.',
+ 'Sem ultraprocessados nem refrigerante; desabituar açúcar aos poucos.',
+ 'Blocos cronometrados de trabalho e estudo, sem checar celular no intervalo. Appblock nos blocos.',
+ 'Não criar novos documentos nem anotações inúteis. Executar a rotina exata.',
+ 'Ver a rotina da semana no domingo.',
+ 'Postura: nunca curvado; peito aberto; falar com o peito; olhar no olho.',
+ 'Ao acordar: ler a seção Manhã do app e abrir o docs Treinamento - Plano físico-espiritual matinal e noturno (https://docs.google.com/document/d/1Lh-rga4LG0BUdr5t7fF7K1JW8n-eKJgHM5U1WhXQEWk/edit).'
+];
+
+/* Imaginação heroica: entrar no estado antes da tarefa, não depois. */
+const HEROICA=[
+ 'Eu no ringue, com a mão levantada, tendo feito o que tinha que ser feito.',
+ 'Eu de faixa preta, ensinando o movimento a alguém que está começando.',
+ 'Eu diante de uma estante que li inteira, e sei defender cada tese dela.',
+ 'Eu provendo: a casa, a escola dos filhos, a mesa cheia, sem olhar preço.',
+ 'Eu na fronteira da IA, construindo o que ninguém construiu ainda.',
+ 'Eu levantando às 05:15 sem negociar, no dia em que menos quero.',
+ 'Eu chegando ao fim da vida sem dever nada a mim mesmo.',
+ 'O homem que meus filhos vão descrever quando falarem de mim.',
+ 'Eu no lugar do Ícaro, do Olavo, do Lucas Maia: não copiando, ocupando o meu.',
+ 'A cara de quem cumpriu o dever num dia ruim: é essa que eu quero no espelho.'
+];
+const MENTALIDADE=[
+ 'Não desperdice a sua existência. Faça as coisas, acorde cedo: o fim é triste.',
+ 'Só existe felicidade no cumprimento do dever.',
+ 'Só existe felicidade no cumprimento do dever. Fora dele não há alegria que dure, só alívio que cobra depois.',
+ 'Quando faço, educo o cérebro a saber que vou fazer: a próxima vez custa menos, porque a promessa passa a ter lastro.',
+ 'Cada ato contra a vontade engrossa a região do cérebro responsável por decidir e sustentar a decisão. É treino de vontade, com efeito físico.',
+ 'Fazer o que devo educa o apetite irascível: a força que faz encarar o difícil deixa de servir ao impulso e passa a servir ao dever.',
+ 'E recupero o senso de que eu atinjo as coisas. Isso sozinho já traz de volta o entusiasmo pelos objetivos: o entusiasmo é consequência de conquistar, não requisito para começar.',
+ 'Intensidade gogginiana: obsessão máxima em tudo o que entrou na agenda.',
+ 'Fazer independente do físico e da emoção: um homem maduro faz o que precisa ser feito.',
+ 'A vontade é treinada: desconforto, mortificação e fazer sem querer fortalecem a vontade.',
+ 'Confiar na rotina: não relativizar nunca mais e não burlar os deveres. Tudo tem um porquê.',
+ 'O começo é difícil, mas sempre vale a pena. Depois vem o dever cumprido e a felicidade.',
+ 'Quanto mais fizer agora, mais feliz no futuro. A recompensa também é de curto prazo.',
+ 'Desconforto é oportunidade de treinar a vontade, não sinal de parar.',
+ 'Regra dos 40 por cento: quando a mente diz chega, ainda há reserva.',
+ 'Bens materiais são bens úteis: meios para fins elevados, não fins.',
+ 'Entrar no mindset antes da tarefa: estado de academia, estado de estudo. Ritual pré-estudo e pré-treino.',
+ 'Motivação psicológica ajuda muito: imaginação heroica de manhã e antes do treino.',
+ 'Disciplina é liberdade: automatizar o que antes custava esforço.',
+ 'Melhorar em relação a critérios objetivos meus, não em relação a alguém.'
+];
+/* Aversivos com tarja: registro obrigatório por serem seus; não entram na rotação da manhã (regra fósforo, não fogueira, decidida por você antes). Ficam em Ver tudo. */
+const TARJA=[
+ 'A cada dia que não dou o meu máximo, mais um dia distante dos meus sonhos. Conversão: a cada dia que dou o máximo, mais perto.',
+ 'Ao ter preguiça, quando eu ficar velho, desejarei ter tido tempo para ter feito.',
+ 'Lembrar dos 30 sem ter feito nada.',
+ 'Já queria fazer luta em 2020, 2023 foi o atraso: logo, é agora ou nunca. Distorção-mãe, nomeada no seu sistema.',
+ 'Sou gênio, mas não tenho força de vontade para desenvolver minha genialidade. Rótulo global.',
+ 'Parar de ser uma fraude e ser um homem. Rótulo global.',
+ 'Do absurdo de perder o tanto de tempo que perco.',
+ 'Já estagnei desde novembro de 2022. Poderia estudar tudo isso desde os 9 anos.',
+ 'O fim é triste: trabalhando 8h num negócio ruim, sem desenvolver IA, porque procrastinei.'
+];
 
 /* ------- estado ------- */
 let hoje=new Date(); let diaSel=fmt(hoje);
 let semSel=segunda(hoje);
 let exaSel=fmt(hoje);
-let insModo='sem'; let insSem=segunda(hoje); let insMes=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1)); let insExa=fmt(hoje);
+let insModo='sem'; let insSem=segunda(hoje); let insMes=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1)); let insAno=hoje.getFullYear(); let insExa=fmt(hoje);
+let manOffset=0;
 
 function fmt(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
 function segunda(d){const x=new Date(d);const g=(x.getDay()+6)%7;x.setDate(x.getDate()-g);return fmt(x)}
 function addDias(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return fmt(d)}
+function diffDias(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000)}
 function labelDia(iso){const d=new Date(iso+'T12:00:00');const w=['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()];return w+', '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()}
 function labelSem(iso){const f=addDias(iso,6);const a=new Date(iso+'T12:00:00'),b=new Date(f+'T12:00:00');return a.getDate()+'/'+(a.getMonth()+1)+' a '+b.getDate()+'/'+(b.getMonth()+1)}
 const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -374,40 +1109,83 @@ function loadExa(iso){return getKey('exame:'+iso)}
 function saveExa(iso,d){setKey('exame:'+iso,d)}
 function loadCof(iso){return getKey('cof:'+iso)}
 function saveCof(iso,d){setKey('cof:'+iso,d)}
+function loadCfg(){const c=Object.assign({},CFG_PADRAO,getKey('config'));if(!c.inicio){c.inicio=fmt(new Date());setKey('config',c)}if(!c.obj)c.obj={};return c}
+function saveCfg(c){setKey('config',c)}
+function loadExtra(){return getKey('manha:extra')}
+function saveExtra(e){setKey('manha:extra',e)}
+
+/* ------- itens ativos ------- */
+function ativo(m){return true}
+function diariasAtivas(){return DIARIAS.filter(ativo)}
+function diariasClassificaveis(){return diariasAtivas().filter(m=>m.tipo!=='contador')}
+function pisoAlvo(m){return {min:m.min,ideal:m.ideal}}
 
 /* ------- classificação de estado (métricas) ------- */
-/* retorna: 'abaixo' | 'min' | 'ideal' | null */
 function classifica(m,st){
+ if(st==='nh')return 'nh';
  if(m.teto){if(st==='ok')return 'ideal'; if(st==='estourou')return 'abaixo'; return null}
  if(m.ideal==='—'){if(st==='min')return 'ideal'; if(st==='abaixo')return 'abaixo'; return null}
  if(st==='ideal')return 'ideal'; if(st==='min')return 'min'; if(st==='abaixo')return 'abaixo'; return null
 }
+/* Barra padrão única, em 4 segmentos, exatamente como a do jiu. Usada em todo lugar onde há total conhecido. */
+function barraPadrao(feito,total){
+ const seg=total/4;
+ let html='<div class="belts">';
+ for(let i=0;i<4;i++){
+   const ini=seg*i, fim=seg*(i+1);
+   const w=Math.max(0,Math.min(1,(feito-ini)/(fim-ini)));
+   html+='<div><i style="width:'+Math.round(w*100)+'%"></i></div>';
+ }
+ return html+'</div>';
+}
+function classificaDia(m,diaIso,dd){return classifica(m,dd[m.id])}
+
+/* ------- hardskill: contadores semanais ------- */
+function hsSemana(segIso){
+ const tot=loadSem(segIso).hs||{}; let soma=0; for(const k in tot)soma+=tot[k];
+ return {tot,soma};
+}
 
 /* ------- visão diária ------- */
+function anel(pct,txt,sub){
+ const r=26, c=2*Math.PI*r, off=c*(1-pct/100);
+ return '<div class="ring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="'+r+'" class="bg"/><circle cx="32" cy="32" r="'+r+'" class="fg" style="stroke-dasharray:'+c.toFixed(1)+';stroke-dashoffset:'+off.toFixed(1)+'"/></svg><div class="rt"><div class="rn">'+txt+'</div><div class="rs">'+sub+'</div></div></div>';
+}
+/* ------- app Android: tempo do Samsung Notes ------- */
+const NATIVO=!!window.PainelNativo;
+function fmtMin(t){if(t<60)return t+' min';const h=Math.floor(t/60),m=t%60;return h+'h'+(m?String(m).padStart(2,'0'):'')}
+function notesLinha(iso){
+ if(!NATIVO)return '';
+ let ok=false; try{ok=PainelNativo.temAcessoUso()}catch(e){return ''}
+ if(!ok)return '<div class="notes">Samsung Notes: <button class="lnk" onclick="event.stopPropagation();PainelNativo.pedirAcessoUso()">permitir acesso ao uso</button></div>';
+ let t=0; try{t=PainelNativo.minutosNotes(iso)}catch(e){return ''}
+ if(t<0)return '';
+ const l=Math.round(t*0.8);
+ return '<div class="notes">Samsung Notes: '+fmtMin(t)+' de tela · leitura estimada <b>'+fmtMin(l)+'</b> (80%)</div>';
+}
+window.painelNativoVoltou=function(){try{if(!document.getElementById('view-dia').classList.contains('hidden'))renderDia()}catch(e){}};
+
 function renderDia(){
  document.getElementById('dlabel').textContent=labelDia(diaSel);
  const dados=loadDia(diaSel);
- let html='';
+ const lista=diariasAtivas(); let feitos=0,ideais=0,aplicaveis=0;
+ for(const m of lista){const c=classificaDia(m,diaSel,dados);if(c==='nh')continue;aplicaveis++;if(c==='min'||c==='ideal')feitos++;if(c==='ideal')ideais++}
+ const pct=aplicaveis?Math.round(feitos/aplicaveis*100):0;
+ let html='<div class="topo">'+anel(pct,pct+'%','piso')+'<div class="topotxt"><div class="tn">'+feitos+' de '+aplicaveis+'</div><div class="ts">no piso ou acima · '+ideais+' no ideal</div></div></div>';
  for(const a of AREAS){
-   const itens=DIARIAS.filter(m=>m.a===a); if(!itens.length)continue;
-   html+='<div class="area"><h2>'+a+'</h2>';
+   const itens=diariasAtivas().filter(m=>m.a===a); if(!itens.length)continue;
+   let fa=0,ta=0; for(const m of itens){const c=classificaDia(m,diaSel,dados);if(c==='nh')continue;ta++;if(c==='min'||c==='ideal')fa++}
+   html+='<div class="area"><h2>'+a+(ta?'<span class="cnt">'+fa+'/'+ta+'</span>':'')+'</h2>';
    for(const m of itens){
-     const st=dados[m.id]||null;
-     html+='<div class="item"><div class="info"><div class="name">'+m.n+'</div><div class="meta">'+
-       (m.teto?('Teto: '+m.ideal):('Mín: '+m.min+(m.ideal!=='—'?' · Ideal: '+m.ideal:'')))+'</div></div>';
+     const st=dados[m.id]||null; const pa=pisoAlvo(m);
+     const cls=classifica(m,st); const meta=(m.teto?('Teto '+esc(pa.ideal)):('Mín '+esc(pa.min)+(pa.ideal!=='—'?' · Ideal '+esc(pa.ideal):'')));
+     html+='<div class="item'+(cls==='ideal'?' done':cls==='min'?' half':'')+'"><div class="info" onclick="this.classList.toggle(\'open\')"><div class="name">'+esc(m.n)+'</div><div class="meta">'+meta+'</div>'+(m.id==='leitura'?notesLinha(diaSel):'')+'<div class="pq">'+(m.gatilho?'Gatilho: '+esc(m.gatilho)+'. ':'')+(m.pq?esc(m.pq):'')+'</div></div>';
      if(m.teto){
-       html+='<div class="seg">'+
-        '<button class="'+(st==='estourou'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'estourou\')">Estourou</button>'+
-        '<button class="'+(st==='ok'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ok\')">Dentro</button></div>';
+       html+='<div class="seg"><button class="'+(st==='estourou'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'estourou\')">Estourou</button><button class="'+(st==='ok'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ok\')">Dentro</button></div>';
      }else if(m.ideal==='—'){
-       html+='<div class="seg">'+
-        '<button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button>'+
-        '<button class="'+(st==='min'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Feito</button></div>';
+       html+='<div class="seg"><button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button><button class="'+(st==='min'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Feito</button>'+(m.nh?'<button class="'+(st==='nh'?'on-nh':'')+'" onclick="marca(\''+m.id+'\',\'nh\')">N.H.</button>':'')+'</div>';
      }else{
-       html+='<div class="seg">'+
-        '<button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button>'+
-        '<button class="'+(st==='min'?'on-min':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Mín</button>'+
-        '<button class="'+(st==='ideal'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ideal\')">Ideal</button></div>';
+       html+='<div class="seg"><button class="'+(st==='abaixo'?'on-abaixo':'')+'" onclick="marca(\''+m.id+'\',\'abaixo\')">Abaixo</button><button class="'+(st==='min'?'on-min':'')+'" onclick="marca(\''+m.id+'\',\'min\')">Mín</button><button class="'+(st==='ideal'?'on-ideal':'')+'" onclick="marca(\''+m.id+'\',\'ideal\')">Ideal</button></div>';
      }
      html+='</div>';
    }
@@ -416,44 +1194,60 @@ function renderDia(){
  document.getElementById('lista-dia').innerHTML=html;
 }
 function marca(id,val){
- const d=loadDia(diaSel);
- d[id]=(d[id]===val)?null:val;
- saveDia(diaSel,d); renderDia();
+ const d=loadDia(diaSel); const novo=(d[id]===val)?null:val; d[id]=novo; saveDia(diaSel,d);
+ const m=DIARIAS.find(x=>x.id===id);
+ if(m&&m.espelho){const e=loadExa(diaSel); e[m.espelho]=(novo==='min')?'sim':(novo==='abaixo')?'nao':(novo==='nh')?'nh':null; saveExa(diaSel,e)}
+ renderDia();
 }
+function hsConta(id,n){const d=loadSem(semSel);d.hs=d.hs||{};d.hs[id]=Math.max(0,(d.hs[id]||0)+n);saveSem(semSel,d);renderSem()}
 function mudarDia(n){diaSel=addDias(diaSel,n);renderDia()}
 
 /* ------- visão semanal ------- */
 function renderSem(){
  document.getElementById('wlabel').textContent='Semana '+labelSem(semSel);
  const dados=loadSem(semSel);
+ const hsm=SEMANAIS.find(m=>m.id==='hardskill'); const ws=hsSemana(semSel);
  let html='';
  for(const a of AREAS){
-   const itens=SEMANAIS.filter(m=>m.a===a); if(!itens.length)continue;
+   const itens=SEMANAIS.filter(m=>m.a===a);
+   if(!itens.length)continue;
    html+='<div class="area"><h2>'+a+'</h2>';
    for(const m of itens){
+     if(m.tipo==='blocos'){
+       const hs=dados.hs||{}; let soma=0; for(const k in hs)soma+=hs[k];
+       const okMin=soma>=m.min, okIdeal=soma>=m.ideal;
+       html+='<div class="item'+(okIdeal?' done':okMin?' half':'')+'" style="display:block"><div class="info"><div class="name">'+esc(m.n)+' <span style="float:right;font-weight:700">'+soma+'</span></div><div class="meta">Mín '+m.min+' · Ideal '+m.ideal+'</div><div class="pq">'+esc(m.pq)+'</div></div>';
+       for(const s of m.sub){
+         html+='<div class="wk-item"><span class="txt">'+esc(s.n)+'</span><div class="counter"><button onclick="hsConta(\''+s.id+'\',-1)">−</button><div class="val">'+(hs[s.id]||0)+'</div><button onclick="hsConta(\''+s.id+'\',1)">+</button></div></div>';
+       }
+       html+='</div>';
+       continue;
+     }
      const v=dados[m.id]||0;
      const hitIdeal=m.ideal!=null&&v>=m.ideal;
      const dot=hitIdeal?'dot-ideal':(v>=m.min&&m.min>0?'dot-min':'');
-     html+='<div class="item"><div class="status-dot '+dot+'"></div><div class="info"><div class="name">'+m.n+'</div>'+
-      '<div class="meta">Mín: '+m.min+'x · Ideal: '+(m.ideal!=null?m.ideal+'x':m.idealTxt)+'</div></div>'+
-      '<div class="counter"><button onclick="conta(\''+m.id+'\',-1)">−</button><div class="val">'+v+'</div><button onclick="conta(\''+m.id+'\',1)">+</button></div></div>';
+     const metaTxt=m.tipo==='escala'?('Mín '+m.escala[m.min-1]+' · Ideal '+m.escala[m.ideal-1]):('Mín '+m.min+' · Ideal '+m.ideal);
+     html+='<div class="item'+(hitIdeal?' done':(v>=m.min&&m.min>0?' half':''))+'"><div class="status-dot '+dot+'"></div><div class="info" onclick="this.classList.toggle(\'open\')"><div class="name">'+esc(m.n)+'</div><div class="meta">'+metaTxt+'</div>'+(m.pq?'<div class="pq">'+esc(m.pq)+'</div>':'')+'</div>';
+     if(m.tipo==='escala'){
+       html+='<div class="seg escala">'+m.escala.map((rot,i)=>{const val=i+1;const on=v===val?(val>=m.ideal?'on-ideal':val>=m.min?'on-min':'on-abaixo'):'';return '<button class="'+on+'" onclick="escala(\''+m.id+'\','+val+')">'+esc(rot)+'</button>'}).join('')+'</div>';
+     }else{
+       html+='<div class="counter"><button onclick="conta(\''+m.id+'\',-1)">−</button><div class="val">'+v+'</div><button onclick="conta(\''+m.id+'\',1)">+</button></div>';
+     }
+     if(m.km)html+='<div style="width:100%;display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px;color:var(--ink-2)">Km corridos no domingo <input type="number" step="0.1" min="0" value="'+(dados.km!=null?dados.km:'')+'" onchange="setKm(this.value)"></div>';
+     html+='</div>';
    }
    html+='</div>';
  }
  document.getElementById('lista-sem').innerHTML=html;
 }
-function conta(id,n){
- const d=loadSem(semSel);
- d[id]=Math.max(0,(d[id]||0)+n);
- saveSem(semSel,d); renderSem();
-}
+function conta(id,n){const d=loadSem(semSel);d[id]=Math.max(0,(d[id]||0)+n);saveSem(semSel,d);renderSem()}
+function escala(id,val){const d=loadSem(semSel);d[id]=(d[id]===val)?null:val;saveSem(semSel,d);renderSem()}
+function setKm(v){const d=loadSem(semSel);d.km=v===''?null:parseFloat(v);saveSem(semSel,d)}
 function mudarSemana(n){semSel=addDias(semSel,7*n);renderSem()}
 
 /* ------- visão exame ------- */
 function clsEx(v,inv){if(v==='nh')return 'on-nh';return v===(inv?'nao':'sim')?'on-ideal':'on-abaixo'}
-function segEx(itemId,val,cur,txt,inv){
- return '<button data-ex="'+itemId+'" data-v="'+val+'" data-inv="'+(inv?1:0)+'" class="'+(cur===val?clsEx(val,inv):'')+'">'+txt+'</button>';
-}
+function segEx(itemId,val,cur,txt,inv){return '<button data-ex="'+itemId+'" data-v="'+val+'" data-inv="'+(inv?1:0)+'" class="'+(cur===val?clsEx(val,inv):'')+'">'+txt+'</button>'}
 function renderExa(){
  document.getElementById('elabel').textContent=labelDia(exaSel);
  const d=loadExa(exaSel), c=loadCof(exaSel);
@@ -464,35 +1258,21 @@ function renderExa(){
    if(b.sub)html+='<div class="sub2">'+esc(b.sub)+'</div>';
    if(b.nota)html+='<div class="ex-nota">'+esc(b.nota)+'</div>';
    if(b.itens)for(const it of b.itens){
+     if(!ativo(it))continue;
      const cur=d[it.id]||null;
      html+='<div class="ex-item"><div class="ex-top"><div class="ex-q">'+esc(it.q)+(it.inv?'<span class="cof-se">Aqui, Não é a resposta fiel.</span>':'')+'</div><div class="seg">'+
-      segEx(it.id,'sim',cur,'Sim',it.inv)+
-      segEx(it.id,'nao',cur,'Não',it.inv)+
-      (it.nh?segEx(it.id,'nh',cur,'N.H.',it.inv):'')+
-      '</div></div></div>';
+      segEx(it.id,'sim',cur,'Sim',it.inv)+segEx(it.id,'nao',cur,'Não',it.inv)+(it.nh?segEx(it.id,'nh',cur,'N.H.',it.inv):'')+'</div></div></div>';
    }
    html+='</div>';
  }
  document.getElementById('lista-exa').innerHTML=html;
 }
 function renderCofBloco(c){
- let h='<div class="area"><h2>Regras COF — '+esc(COF_ROTULO)+'</h2>'+
-  '<div class="sub2">Quinze regras do mês. N.H. = não houve ocasião; não conta como falta nem como cumprimento.</div>';
+ let h='<div class="area"><h2>Regras COF — '+esc(COF_ROTULO)+'</h2><div class="sub2">Regras do mês. N.H. = não houve ocasião; não conta como falta nem como cumprimento.</div>';
  COF_REGRAS.forEach((r,i)=>{
-   const st=(c[r.id]||{}), cur=st.r||null, imp=st.m||null;
-   h+='<div class="ex-item" data-cofwrap="'+r.id+'"><div class="ex-top"><div class="ex-q">'+
-     '<span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+
-     (r.se||r.entao?'<span class="cof-se">Se '+esc(r.se)+' → então '+esc(r.entao)+'</span>':'')+
-     '</div><div class="seg">'+
-     '<button data-cof="'+r.id+'" data-v="cumpri" class="'+(cur==='cumpri'?'on-ideal':'')+'">Cumpri</button>'+
-     '<button data-cof="'+r.id+'" data-v="faltei" class="'+(cur==='faltei'?'on-abaixo':'')+'">Faltei</button>'+
-     '<button data-cof="'+r.id+'" data-v="nh" class="'+(cur==='nh'?'on-nh':'')+'">N.H.</button>'+
-     '</div></div>'+
-     '<div class="imput'+(cur==='faltei'?' show':'')+'" data-imp="'+r.id+'"><div class="q">A falta foi:</div><div class="seg">'+
-     '<button data-cofm="'+r.id+'" data-v="livre" class="'+(imp==='livre'?'on-abaixo':'')+'">Livre</button>'+
-     '<button data-cofm="'+r.id+'" data-v="misto" class="'+(imp==='misto'?'on-min':'')+'">Misto</button>'+
-     '<button data-cofm="'+r.id+'" data-v="compelido" class="'+(imp==='compelido'?'on-nh':'')+'">Compelido</button>'+
-     '</div></div></div>';
+   const st=(c[r.id]||{}), cur=st.r||null;
+   h+='<div class="ex-item" data-cofwrap="'+r.id+'"><div class="ex-top"><div class="ex-q"><span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+(r.se||r.entao?'<span class="cof-se">Se '+esc(r.se)+' → então '+esc(r.entao)+'</span>':'')+'</div><div class="seg">'+
+     '<button data-cof="'+r.id+'" data-v="cumpri" class="'+(cur==='cumpri'?'on-ideal':'')+'">Cumpri</button><button data-cof="'+r.id+'" data-v="faltei" class="'+(cur==='faltei'?'on-abaixo':'')+'">Faltei</button><button data-cof="'+r.id+'" data-v="nh" class="'+(cur==='nh'?'on-nh':'')+'">N.H.</button></div></div></div>';
  });
  return h+'</div>';
 }
@@ -500,44 +1280,33 @@ document.getElementById('lista-exa').addEventListener('click',ev=>{
  const b=ev.target.closest('button'); if(!b)return;
  if(b.dataset.ex){
    const d=loadExa(exaSel), id=b.dataset.ex, v=b.dataset.v;
-   d[id]=(d[id]===v)?null:v; saveExa(exaSel,d);
+   const novo=(d[id]===v)?null:v; d[id]=novo; saveExa(exaSel,d);
+   const espelhada=DIARIAS.find(x=>x.espelho===id);
+   if(espelhada){const dd=loadDia(exaSel); dd[espelhada.id]=(novo==='sim')?'min':(novo==='nao')?'abaixo':(novo==='nh')?'nh':null; saveDia(exaSel,dd)}
    const inv=b.dataset.inv==='1';
    b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(d[id]===x.dataset.v)?clsEx(x.dataset.v,inv):''});
    return;
  }
  if(b.dataset.cof){
-   const c=loadCof(exaSel), id=b.dataset.cof, v=b.dataset.v;
-   const st=c[id]||{};
-   st.r=(st.r===v)?null:v;
-   if(st.r!=='faltei')st.m=null;
-   c[id]=st; saveCof(exaSel,c);
+   const c=loadCof(exaSel), id=b.dataset.cof, v=b.dataset.v; const st=c[id]||{};
+   st.r=(st.r===v)?null:v; st.m=null; c[id]=st; saveCof(exaSel,c);
    b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(st.r===x.dataset.v)?(x.dataset.v==='cumpri'?'on-ideal':x.dataset.v==='faltei'?'on-abaixo':'on-nh'):''});
-   const imp=document.querySelector('[data-imp="'+id+'"]');
-   imp.classList.toggle('show',st.r==='faltei');
-   if(st.r!=='faltei')imp.querySelectorAll('button').forEach(x=>x.className='');
-   return;
- }
- if(b.dataset.cofm){
-   const c=loadCof(exaSel), id=b.dataset.cofm, v=b.dataset.v;
-   const st=c[id]||{};
-   st.m=(st.m===v)?null:v; c[id]=st; saveCof(exaSel,c);
-   b.parentElement.querySelectorAll('button').forEach(x=>{x.className=(st.m===x.dataset.v)?(x.dataset.v==='livre'?'on-abaixo':x.dataset.v==='misto'?'on-min':'on-nh'):''});
  }
 });
 function mudarExame(n){exaSel=addDias(exaSel,n);renderExa()}
 
 /* ------- agregadores: métricas ------- */
 function statsDias(dias){
- const hojeIso=fmt(new Date());
- let ab=0,mi=0,idl=0,tot=0;
- const porMetrica={}; DIARIAS.forEach(m=>porMetrica[m.id]={ab:0,mi:0,idl:0,vazio:0,dias:[]});
+ const hojeIso=fmt(new Date()); const lista=diariasAtivas();
+ let ab=0,mi=0,idl=0,tot=0; const porMetrica={}; lista.forEach(m=>porMetrica[m.id]={ab:0,mi:0,idl:0,vazio:0,dias:[]});
  let diasContados=0;
  for(const d of dias){
-   if(d>hojeIso){DIARIAS.forEach(m=>porMetrica[m.id].dias.push('futuro'));continue}
-   diasContados++;
-   const dd=loadDia(d);
-   for(const m of DIARIAS){
-     const c=classifica(m,dd[m.id]);
+   if(d>hojeIso){lista.forEach(m=>porMetrica[m.id].dias.push('futuro'));continue}
+   diasContados++; const dd=loadDia(d);
+   for(const m of lista){
+     const c=classificaDia(m,d,dd);
+     if(c==='nh'){porMetrica[m.id].dias.push('nh');continue}
+     if(c===null&&d===hojeIso){porMetrica[m.id].dias.push('vazio');continue}
      tot++;
      if(c==='abaixo'){ab++;porMetrica[m.id].ab++;porMetrica[m.id].dias.push('red')}
      else if(c==='min'){mi++;porMetrica[m.id].mi++;porMetrica[m.id].dias.push('yellow')}
@@ -545,71 +1314,345 @@ function statsDias(dias){
      else{porMetrica[m.id].vazio++;porMetrica[m.id].dias.push('vazio')}
    }
  }
- return {ab,mi,idl,tot,porMetrica,diasContados,
-   pctAb:tot?Math.round(ab/tot*100):0,
-   pctPiso:tot?Math.round((mi+idl)/tot*100):0,
-   pctIdeal:tot?Math.round(idl/tot*100):0};
+ return {ab,mi,idl,tot,porMetrica,diasContados,pctAb:tot?Math.round(ab/tot*100):0,pctPiso:tot?Math.round((mi+idl)/tot*100):0,pctIdeal:tot?Math.round(idl/tot*100):0};
 }
-function pisoDoDia(iso){
- const dd=loadDia(iso); let h=0;
- for(const m of DIARIAS){const c=classifica(m,dd[m.id]);if(c==='min'||c==='ideal')h++}
- return Math.round(h/DIARIAS.length*100);
-}
+function pisoDoDia(iso){const dd=loadDia(iso);const lista=diariasAtivas();let h=0,n=0;for(const m of lista){const c=classificaDia(m,iso,dd);if(c==='nh')continue;n++;if(c==='min'||c==='ideal')h++}return n?Math.round(h/n*100):0}
 function semanaCompleta(iso){return addDias(iso,6)<fmt(new Date())}
-function idealDaSemana(iso){
- const dias=[...Array(7)].map((_,i)=>addDias(iso,i));
- const s=statsDias(dias); return s.pctIdeal;
-}
+function idealDaSemana(iso){const dias=[...Array(7)].map((_,i)=>addDias(iso,i));return statsDias(dias).pctIdeal}
+function pisoDaSemana(iso){const dias=[...Array(7)].map((_,i)=>addDias(iso,i));return statsDias(dias).pctPiso}
 
 /* ------- agregadores: exame e COF ------- */
-function itensExame(){
- const out=[]; for(const b of EXAME){if(b.itens)for(const it of b.itens)out.push({...it,bloco:b.t})}
- return out;
-}
+function itensExame(){const out=[];for(const b of EXAME){if(b.itens)for(const it of b.itens)if(ativo(it))out.push({...it,bloco:b.t})}return out}
 function statsExame(dias){
- const hojeIso=fmt(new Date());
- const itens=itensExame();
- const por={}; itens.forEach(i=>por[i.id]={fiel:0,falta:0,nh:0});
- const porBloco={};
+ const hojeIso=fmt(new Date()); const itens=itensExame();
+ const por={}; itens.forEach(i=>por[i.id]={fiel:0,falta:0,nh:0}); const porBloco={};
  let fiel=0,falta=0,nh=0,feitos=0,contados=0;
  for(const d of dias){
-   if(d>hojeIso)continue;
-   contados++;
-   const dd=loadExa(d);
-   let marcou=false;
-   for(const i of itens){
-     const v=dd[i.id]; if(!v)continue;
-     marcou=true;
-     if(v==='nh'){nh++;por[i.id].nh++}
-     else if(v===(i.inv?'nao':'sim')){fiel++;por[i.id].fiel++}
-     else{falta++;por[i.id].falta++}
-   }
+   if(d>hojeIso)continue; contados++; const dd=loadExa(d); let marcou=false;
+   for(const i of itens){const v=dd[i.id];if(!v)continue;marcou=true;if(v==='nh'){nh++;por[i.id].nh++}else if(v===(i.inv?'nao':'sim')){fiel++;por[i.id].fiel++}else{falta++;por[i.id].falta++}}
    if(marcou)feitos++;
  }
- for(const i of itens){
-   const b=i.bloco; if(!porBloco[b])porBloco[b]={fiel:0,falta:0};
-   porBloco[b].fiel+=por[i.id].fiel; porBloco[b].falta+=por[i.id].falta;
- }
+ for(const i of itens){const b=i.bloco;if(!porBloco[b])porBloco[b]={fiel:0,falta:0};porBloco[b].fiel+=por[i.id].fiel;porBloco[b].falta+=por[i.id].falta}
  const reais=fiel+falta;
- return {fiel,falta,nh,reais,por,porBloco,feitos,contados,itens,
-   pctFid:reais?Math.round(fiel/reais*100):0,
-   pctFeito:contados?Math.round(feitos/contados*100):0};
+ return {fiel,falta,nh,reais,por,porBloco,feitos,contados,itens,pctFid:reais?Math.round(fiel/reais*100):0,pctFeito:contados?Math.round(feitos/contados*100):0};
 }
 function statsCof(dias){
- const hojeIso=fmt(new Date());
- const por={}; COF_REGRAS.forEach(r=>por[r.id]={cumpri:0,faltei:0,nh:0,livre:0,misto:0,compelido:0});
- for(const d of dias){
-   if(d>hojeIso)continue;
-   const dd=loadCof(d);
-   for(const r of COF_REGRAS){
-     const st=dd[r.id]; if(!st||!st.r)continue;
-     if(st.r==='cumpri')por[r.id].cumpri++;
-     else if(st.r==='nh')por[r.id].nh++;
-     else if(st.r==='faltei'){por[r.id].faltei++; if(st.m)por[r.id][st.m]++}
-   }
- }
+ const hojeIso=fmt(new Date()); const por={}; COF_REGRAS.forEach(r=>por[r.id]={cumpri:0,faltei:0,nh:0});
+ for(const d of dias){if(d>hojeIso)continue;const dd=loadCof(d);for(const r of COF_REGRAS){const st=dd[r.id];if(!st||!st.r)continue;if(st.r==='cumpri')por[r.id].cumpri++;else if(st.r==='nh')por[r.id].nh++;else if(st.r==='faltei'){por[r.id].faltei++}}}
  return por;
 }
+/* Dias sem X: mesma regra das sequências.
+   Dia passado sem resposta conta como falha. Hoje sem resposta não conta nem quebra.
+   N.H. é pulado sem quebrar. Aula (d5) também pula sábado e domingo. */
+function diasSem(itemId,inv){
+ const c=loadCfg(); const hojeIso=fmt(new Date()); const it=itensExame().find(i=>i.id===itemId); if(!it)return null;
+ const fielV=inv?'nao':'sim';
+ const estado=d=>{
+   if(itemId==='d5'){const wd=new Date(d+'T12:00:00').getDay();if(wd===0||wd===6)return 'na'}
+   const v=loadExa(d)[itemId];
+   if(v==='nh')return 'na';
+   if(v===fielV)return 'ok';
+   if(v)return 'falta';
+   return d===hojeIso?'hoje':'vazio';
+ };
+ let run=0, recorde=0, ultima=null, ultimaTipo=null, ocorr=0;
+ for(let d=c.inicio; d<=hojeIso; d=addDias(d,1)){
+   const e=estado(d);
+   if(e==='na'||e==='hoje')continue;
+   if(e==='ok'){run++;if(run>recorde)recorde=run;continue}
+   run=0; ultima=d; ultimaTipo=e; if(e==='falta')ocorr++;
+ }
+ const desde=ultima?(ultimaTipo==='vazio'?'último dia sem resposta em ':'última falta em ')+labelCurto(ultima):'desde o início, '+labelCurto(c.inicio);
+ return {atual:run,recorde,ocorr,desde};
+}
+
+/* Sequência semanal genérica: conta semanas fechadas em que a métrica bateu o alvo. */
+function seqSemanal(id,alvo){
+ const c=loadCfg(); const hojeSeg=segunda(new Date());
+ let recorde=0, run=0;
+ for(let s=segunda(new Date(c.inicio+'T12:00:00'));s<hojeSeg;s=addDias(s,7)){
+   if((loadSem(s)[id]||0)>=alvo){run++;if(run>recorde)recorde=run}else{run=0}
+ }
+ return {atual:run,recorde};
+}
+function seqSemanalMissa(){return seqSemanal('missa',1)}
+/* ------- objetivos: cálculo ------- */
+function semanasDesde(inicio){const out=[];const hojeSeg=segunda(new Date());for(let s=segunda(new Date(inicio+'T12:00:00'));s<=hojeSeg;s=addDias(s,7))out.push(s);return out}
+function diasDesde(inicio){const out=[];const h=fmt(new Date());for(let d=inicio;d<=h;d=addDias(d,1))out.push(d);return out}
+/* Padrão único para todo objetivo com número: total = ajuste (livre, +/-, piso 0) + automático (o que a aba Semana ou Dia já registrou de verdade desde o início). Sem ajuste manual, o automático sozinho já é o total; sem registro automático, o ajuste sozinho já é o total. Mesma mecânica em todos, sem exceção — só as sequências (estado de graça, terço e rezas, Insper) não têm ajuste, porque medem dias seguidos, não uma soma. */
+function cfgObj(o){const c=loadCfg();const e=c.obj[o.id]||{};return {total:e.total!=null?e.total:o.total,manual:e.manual!=null?e.manual:(o.inicial||0)}}
+function progresso(o){
+ const c=loadCfg(); const e=cfgObj(o); let feito=e.manual, km=0, perda=0, semanas=semanasDesde(c.inicio);
+ if(o.src){
+   if(o.src.tipo==='sem'){
+     const ids=o.src.ids||[o.src.id]; let zeroSeg=0;
+     for(const s of semanas){
+       const w=loadSem(s); let v=0; for(const id of ids)v+=(w[id]||0); feito+=v; if(o.km&&w.km)km+=w.km;
+       if((o.modelo==='faixas'||o.perda2sem)&&semanaCompleta(s)){ if(v===0){zeroSeg++; if(zeroSeg===2){perda++;zeroSeg=0}} else zeroSeg=0 }
+     }
+   }else if(o.src.tipo==='hs'){for(const s of semanas)feito+=((loadSem(s).hs||{})[o.src.id]||0)}
+   else if(o.src.tipo==='dia'){const m=DIARIAS.find(x=>x.id===o.src.id);for(const d of diasDesde(c.inicio)){const cl=classifica(m,loadDia(d)[o.src.id]);if(cl==='min'||cl==='ideal')feito++}}
+   else if(o.src.tipo==='exa'){const it=itensExame().find(i=>i.id===o.src.id);if(it)for(const d of diasDesde(c.inicio)){if(loadExa(d)[o.src.id]===(it.inv?'nao':'sim'))feito++}}
+ }
+ let bruto=feito; const automatico=bruto-e.manual;
+ if(o.modelo==='faixas'){
+   const fx=FAIXAS.find(f=>bruto>=f.ini&&bruto<f.fim)||FAIXAS[FAIXAS.length-1];
+   feito=Math.max(fx.ini,bruto-perda);
+ } else if(o.perda2sem&&perda){
+   feito=Math.max(e.manual,bruto-perda);
+ }
+ const pct=e.total?Math.min(100,Math.round(feito/e.total*100)):null;
+ return {feito,bruto,perda,km,total:e.total,pct,ajuste:e.manual,automatico};
+}
+/* sequências: dias seguidos. Começa em ontem se hoje ainda não foi marcado. Recorde desde o início da contagem. */
+/* Predicados de sequência.
+   Retornam: true (cumpriu), false (falhou), 'na' (não se aplica: fim de semana, dia sem treino),
+   null (dia não marcado). Dia passado não marcado quebra a sequência: não fazer é não fazer. */
+function seqPred(tipo){
+ const terco=DIARIAS.find(m=>m.id==='terco'), graca=DIARIAS.find(m=>m.id==='graca');
+ const okM=(id,v)=>{const c=classifica(DIARIAS.find(m=>m.id===id)||{ideal:'algumas'},v);return c==='min'||c==='ideal'};
+ const porMetrica=(id,alvo)=>d=>{const v=loadDia(d)[id];if(!v)return null;const cl=classifica(DIARIAS.find(m=>m.id===id),v);if(cl==='nh')return 'na';return alvo==='ideal'?cl==='ideal':(cl==='min'||cl==='ideal')};
+ const porExame=id=>d=>{const v=loadExa(d)[id];if(!v)return null;if(v==='nh')return 'na';return v==='sim'};
+ if(tipo==='graca')return porMetrica('graca','ideal');
+ /* Terço e as três rezas. Dias antigos, anteriores à divisão, usam o registro único "rezas". */
+ if(tipo==='oracao')return d=>{
+   const dd=loadDia(d); const novas=['rezaManha','rezaMeio','rezaNoite'];
+   const temNova=novas.some(k=>dd[k]);
+   if(!dd.terco&&!temNova&&!dd.rezas)return null;
+   if(temNova){
+     const itens=['terco'].concat(novas);
+     if(itens.some(k=>dd[k]&&!okM(k,dd[k])))return false;
+     if(itens.some(k=>!dd[k]))return null;
+     return true;
+   }
+   const t=okM('terco',dd.terco);
+   const r=dd.rezas==='min'||dd.rezas==='ideal';
+   return t&&r;
+ };
+ if(tipo==='insper')return d=>{const wd=new Date(d+'T12:00:00').getDay();if(wd===0||wd===6)return 'na';const v=loadExa(d).d5;if(!v)return null;if(v==='nh')return 'na';return v==='sim'};
+ if(tipo==='pegada')return porMetrica('pegada');
+ if(tipo==='alongamento')return porMetrica('alongamento');
+ if(tipo==='creatina')return porMetrica('creatina');
+ if(tipo==='beta')return porMetrica('beta');
+ if(tipo==='naodeitar')return porMetrica('naodeitar','ideal');
+ if(tipo==='arranque')return porMetrica('arranque');
+ if(tipo==='cerebro')return d=>{
+   const partes=[porMetrica('arranque')(d),porMetrica('creatina')(d),porMetrica('beta')(d),porMetrica('alongamento')(d),porMetrica('pegada')(d),seqPred('insper')(d)];
+   const reais=partes.filter(r=>r!=='na');
+   if(reais.some(r=>r===false))return false;
+   if(reais.some(r=>r===null))return null;
+   if(!reais.length)return 'na';
+   return true;
+ };
+ if(tipo==='postreino')return porMetrica('postreino');
+ if(tipo==='banho')return porExame('a1');
+ if(tipo==='pureza')return porExame('c1');
+ if(tipo==='leitura1h')return porMetrica('leitura');
+ if(tipo==='dieta')return porMetrica('dieta');
+ if(tipo==='beleza')return porMetrica('extra');
+ return ()=>null;
+}
+/* Sequência atual: conta de hoje para trás. Hoje ainda não marcado não conta nem quebra.
+   Qualquer dia anterior não marcado ou falhado quebra. 'na' é pulado sem quebrar. */
+function sequencia(tipo,credito){
+ const c=loadCfg(), pred=seqPred(tipo), hojeIso=fmt(new Date());
+ let atual=0, temDado=false;
+ for(let d=hojeIso; d>=c.inicio; d=addDias(d,-1)){
+   const r=pred(d);
+   if(r!==null&&r!=='na')temDado=true;
+   if(r==='na')continue;
+   if(r===true){atual++;continue}
+   if(r===false)break;
+   if(d===hojeIso)continue;
+   break;
+ }
+ let rec=0,run=0;
+ for(let x=c.inicio;x<addDias(hojeIso,1);x=addDias(x,1)){
+   const r=pred(x);
+   if(r==='na')continue;
+   if(r===true){run++;if(run>rec)rec=run;continue}
+   if(x===hojeIso&&r===null)continue;
+   run=0;
+ }
+ if(credito&&!temDado){atual+=credito;if(atual>rec)rec=atual}
+ if(atual>rec)rec=atual;
+ return {atual,recorde:rec};
+}
+/* ------- objetivos: tela ------- */
+function resumoObj(){
+ const barras=OBJETIVOS.filter(o=>o.modelo!=='seq'&&o.modelo!=='seqmissa'&&o.modelo!=='seqsem').map(o=>{const p=progresso(o);return {n:o.n,pct:p.pct,feito:p.feito,total:p.total,unid:o.unid}});
+ const comMeta=barras.filter(b=>b.total);
+ const media=comMeta.length?Math.round(comMeta.reduce((s,b)=>s+b.pct,0)/comMeta.length):0;
+ const feitos=comMeta.reduce((s,b)=>s+b.feito,0), totais=comMeta.reduce((s,b)=>s+b.total,0);
+ return '<div class="topo">'+anel(media,media+'%','média')+'<div class="topotxt"><div class="tn">'+feitos+' de '+totais+'</div><div class="ts">unidades de execução em '+comMeta.length+' metas com número fechado</div></div></div>';
+}
+function renderObj(){
+ const c=loadCfg(); let html=resumoObj()+'<div class="note" style="margin-top:6px">Execução acumulada desde '+labelCurto(c.inicio)+'.</div>';
+ for(const a of AREAS){
+   const objs=OBJETIVOS.filter(o=>o.a===a&&ativo(o)); if(!objs.length)continue;
+   html+='<div class="area"><h2>'+a+'</h2>';
+   for(const o of objs){
+     if(o.modelo==='seq'){
+       const s=sequencia(o.seq,o.credito||0);
+       html+='<div class="objcard seq"><div class="oname">'+esc(o.n)+'</div><div class="seqnum">'+s.atual+'<small> dias · recorde '+s.recorde+'</small></div>'+(o.pq?'<div class="pq">'+esc(o.pq)+'</div>':'')+'</div>';
+       continue;
+     }
+     if(o.modelo==='seqmissa'||o.modelo==='seqsem'){
+       const s=o.modelo==='seqmissa'?seqSemanalMissa():seqSemanal(o.seqId,o.seqAlvo);
+       html+='<div class="objcard seq"><div class="oname">'+esc(o.n)+'</div><div class="seqnum">'+s.atual+'<small> semanas · recorde '+s.recorde+'</small></div>'+(o.pq?'<div class="pq">'+esc(o.pq)+'</div>':'')+'</div>';
+       continue;
+     }
+     const p=progresso(o); const e=cfgObj(o);
+     html+='<div class="objcard"><div class="ohead"><div class="oname">'+esc(o.n)+'</div><div class="opct">'+(p.pct!=null?p.pct+'%':'')+'</div></div>';
+     if(o.modelo==='faixas'){
+       const fx=FAIXAS.find(f=>p.feito>=f.ini&&p.feito<f.fim)||FAIXAS[FAIXAS.length-1];
+       const porGrau=(fx.fim-fx.ini)/5; const naFaixa=p.feito-fx.ini; const grau=Math.min(4,Math.floor(naFaixa/porGrau)); const noGrau=naFaixa-grau*porGrau;
+       html+='<div class="belts">'+FAIXAS.map(f=>{const w=Math.max(0,Math.min(1,(p.feito-f.ini)/(f.fim-f.ini)));return '<div><i style="width:'+Math.round(w*100)+'%"></i></div>'}).join('')+'</div>'+
+        '<div class="onum">'+p.feito+'<small> de 900 aulas · faixa '+fx.n+', grau '+grau+' · '+Math.round(noGrau)+' de '+porGrau+' até o próximo grau'+(p.perda?' · perda '+p.perda:'')+'</small></div>';
+     }else{
+       if(p.total)html+=barraPadrao(p.feito,p.total);
+       html+='<div class="onum">'+p.feito+(p.total?'<small> de '+p.total+' '+esc(o.unid)+'</small>':'<small> '+esc(o.unid)+'</small>')+(o.km?'<small> · '+Math.round(p.km*10)/10+' km</small>':'')+(p.perda?'<small> · perda '+p.perda+'</small>':'')+'</div>';
+     }
+     if(p.automatico)html+='<div class="break">'+p.automatico+' '+esc(o.unid)+' da aba '+(o.src.tipo==='dia'?'Dia':'Semana')+' + '+p.ajuste+' de ajuste</div>';
+     html+='<div class="edit"><div class="counter"><button onclick="objManual(\''+o.id+'\',-1)">−</button><div class="val">'+p.ajuste+'</div><button onclick="objManual(\''+o.id+'\',1)">+</button></div>';
+     if(o.modelo!=='faixas')html+='<label>Total <input type="number" min="0" value="'+(e.total!=null?e.total:'')+'" onchange="objSet(\''+o.id+'\',\'total\',this.value)"></label>';
+     let origem='';
+     if(!o.src)origem='Ajuste manual: não há registro automático.';
+     else if(o.src.tipo==='manual')origem='Ajuste manual: não há registro automático para este.';
+     else if(o.src.tipo==='sem')origem='Ajuste manual, mais o que você marcar na aba Semana.';
+     else if(o.src.tipo==='dia')origem='Ajuste manual, mais o piso cumprido na aba Dia.';
+     html+='</div>'+(o.pq?'<div class="pq">'+esc(o.pq)+'</div>':'')+(origem?'<div class="origem">'+origem+'</div>':'')+'</div>';
+   }
+   html+='</div>';
+ }
+ document.getElementById('painel-obj').innerHTML=html;
+}
+function objSet(id,campo,v){const c=loadCfg();c.obj[id]=c.obj[id]||{};c.obj[id][campo]=v===''?null:parseFloat(v);saveCfg(c);renderObj()}
+function objManual(id,n){const c=loadCfg();const o=OBJETIVOS.find(x=>x.id===id);const atual=cfgObj(o).manual;c.obj[id]=c.obj[id]||{};c.obj[id].manual=Math.max(0,atual+n);saveCfg(c);renderObj()}
+function objAjusteN(id){const c=loadCfg();const o=OBJETIVOS.find(x=>x.id===id);return cfgObj(o).manual}
+
+/* ------- tática da manhã ------- */
+function loadTat(iso){return getKey('tatica:'+iso)}
+function saveTat(iso,d){setKey('tatica:'+iso,d)}
+function renderTat(){
+ const hojeIso=fmt(new Date()); const d=loadTat(hojeIso);
+ let feitos=0, total=0;
+ const txt=x=>typeof x==='string'?x:x.t, opc=x=>typeof x==='object'&&!!x.opc;
+ TATICA.forEach((g,gi)=>g[1].forEach((x,ii)=>{if(opc(x))return;total++;if(d[gi+'.'+ii])feitos++}));
+ const pct=total?Math.round(feitos/total*100):0;
+ let html='<div class="datebar"><div class="dlabel">'+labelDia(hojeIso)+'</div></div>'+
+  '<div class="topo">'+anel(pct,pct+'%','feito')+'<div class="topotxt"><div class="tn">'+feitos+' de '+total+'</div><div class="ts">passos da tática da manhã</div></div></div>';
+ TATICA.forEach((g,gi)=>{
+   html+='<div class="area"><h2>'+esc(g[0])+'</h2>';
+   g[1].forEach((x,ii)=>{
+     const k=gi+'.'+ii, on=!!d[k];
+     html+='<div class="titem'+(on?' on':'')+'" onclick="tatMarca(\''+k+'\')"><div class="tbox">'+(on?'✓':'')+'</div><div class="ttxt">'+esc(txt(x))+(opc(x)?' <span class="topc">opcional</span>':'')+'</div></div>';
+   });
+   html+='</div>';
+ });
+ html+='<div class="backup"><button class="btn" onclick="tatLimpar()">Limpar tudo</button></div>'+
+  '<div class="note">Zera sozinho todo dia. Marque conforme for cumprindo.</div>';
+ document.getElementById('painel-tat').innerHTML=html;
+}
+function tatMarca(k){const h=fmt(new Date());const d=loadTat(h);d[k]=!d[k];saveTat(h,d);renderTat()}
+function tatLimpar(){const h=fmt(new Date());saveTat(h,{});renderTat()}
+
+/* ------- manhã ------- */
+function seed(){const d=new Date();const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)+manOffset*7}
+function pick(lista,k,s){const out=[];const n=lista.length;if(!n)return out;for(let i=0;i<k&&i<n;i++)out.push(lista[(s*7+i*13)%n]);return out}
+function listaCom(nome,base){const ex=loadExtra();const extra=(ex[nome]||[]);return base.concat(extra)}
+function orow(o){
+ const p=progresso(o);
+ const pct=p.total?p.pct:null;
+ return '<div class=\'orow\'><div class=\'otop\'><span>'+esc(o.n)+'</span><span>'+p.feito+(p.total?' de '+p.total+' ('+pct+'%)':' '+esc(o.unid))+(p.perda?' · perda '+p.perda:'')+'</span></div>'+(p.total?barraPadrao(p.feito,p.total):'')+'</div>';
+}
+function objetivosResumo(){
+ let html='';
+ for(const a of AREAS){
+   const objs=OBJETIVOS.filter(o=>o.a===a&&o.modelo!=='seq'&&o.modelo!=='seqmissa'&&o.modelo!=='seqsem'&&ativo(o)); if(!objs.length)continue;
+   html+='<div class=\'k\' style=\'padding-bottom:0\'><span class=\'tp\'>'+esc(a)+'</span></div>'+objs.map(orow).join('');
+ }
+ return html;
+}
+function renderMan(){
+ const s=seed(); const hojeIso=fmt(new Date()); const dd=loadDia(hojeIso);
+ const afirm=pick(listaCom('afirm',AFIRMACOES),1,s)[0];
+ const motis=listaCom('moti',MOTI); const tipos=[...new Set(motis.map(m=>m.t))];
+ const motiSel=pick(tipos,3,s).map((t,i)=>{const l=motis.filter(m=>m.t===t);return l[(s+i)%l.length]});
+ const sonho=pick(listaCom('sonhos',SONHOS),1,s+1)[0];
+ const sens=pick(listaCom('sens',SENSACOES),2,s+2);
+ const ilum=pick(listaCom('ilum',ILUMINACOES),1,s+3)[0];
+ const bel=pick(listaCom('beleza',BELEZA),2,s+11);
+ const emerg=pick(listaCom('emerg',EMERGENTISMO),1,s+4)[0];
+ const anti=pick(listaCom('anti',ANTINEUROSE),1,s+5)[0];
+ const apr=pick(listaCom('apr',APRENDIZADOS),1,s+6)[0];
+ const regra=pick(listaCom('regras',REGRAS),1,s+7)[0];
+ const pai=pick(listaCom('pai',PAI),1,s+8)[0];
+ const necro=pick(listaCom('necro',NECROLOGIO),1,s+10)[0];
+ const ment=pick(listaCom('ment',MENTALIDADE),1,s+9)[0];
+ const her=pick(listaCom('heroica',HEROICA),1,s+12)[0];
+ const seqPorArea=AREAS.map(a=>({
+   area:a,
+   itens:OBJETIVOS.filter(o=>o.a===a&&ativo(o)&&(o.modelo==='seq'||o.modelo==='seqmissa'||o.modelo==='seqsem')).map(o=>{
+     const semanal=o.modelo==='seqmissa'||o.modelo==='seqsem';
+     const s=o.modelo==='seqmissa'?seqSemanalMissa():(o.modelo==='seqsem'?seqSemanal(o.seqId,o.seqAlvo):sequencia(o.seq,o.credito||0));
+     return {n:o.n,unid:semanal?'semanas':'dias',s};
+   })
+ })).filter(g=>g.itens.length);
+ let html='<div class="datebar"><div class="dlabel">'+labelDia(hojeIso)+'</div></div>'+
+  '<div class="mcard abertura">'+ABERTURA.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="arranque">'+ARRANQUE.map((x,i)=>'<span class="ar"><b>'+(i+1)+'</b>'+esc(x)+'</span>').join('<i>›</i>')+'</div>'+
+  '<div class="afirm">'+esc(afirm)+'</div>'+
+  seqPorArea.map(g=>'<div class="seqarea">'+esc(g.area)+'</div><div class="stripe">'+g.itens.map(x=>'<div class="st"><div class="stn">'+x.s.atual+'</div><div class="stl">'+esc(x.n)+'<br>recorde '+x.s.recorde+' '+x.unid+'</div></div>').join('')+'</div>').join('')+
+  '<div class="mcard"><div class="lbl">Onde estou</div>'+
+   objetivosResumo()+'</div>'+
+  '<div class="mcard perdendo"><div class="lbl">O que eu nem imagino que estou perdendo</div>'+
+   PERDENDO.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="mcard mapa"><div class="lbl">Eu já sei o mapa</div>'+
+   MAPA.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="mcard confie"><div class="lbl">Confie na rotina</div>'+
+   CONFIE.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="mcard hist"><div class="lbl">História natural de desenvolvimento</div><div class="hresumo">'+esc(HISTORIA_RESUMO)+'</div>'+
+   HISTORIA.map(x=>'<div class="hrow"><span class="hy">'+esc(x[0])+'</span><span class="ht">'+esc(x[1])+'</span></div>').join('')+'</div>'+
+  '<div class="mcard proc"><div class="lbl">A linha do tempo da procrastinação</div><div class="hresumo">'+esc(PROCRASTINACAO_ABERTURA)+'</div>'+
+   PROCRASTINACAO.map(x=>'<div class="hrow"><span class="hy">'+esc(x[0])+'</span><span class="ht">'+esc(x[1])+'</span></div>').join('')+'</div>'+
+  '<div class="mcard"><div class="lbl">Hoje conta</div><div class="k">'+esc(emerg)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Moti</div>'+motiSel.map(m=>'<div class="k"><span class="tp">'+esc(m.t)+'</span>'+esc(m.k)+'</div>').join('')+'</div>'+
+  '<div class="mcard necro"><div class="lbl">Necrológio</div><div class="k">'+esc(necro)+'</div></div>'+
+  '<div class="mcard pai"><div class="lbl">Honra e memento mori</div><div class="k">'+esc(pai)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Imagine que</div><div class="k">'+esc(sonho)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Sensações que a vida já me deu</div>'+sens.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="mcard bela"><div class="lbl">Ocupar a mente com coisa bonita</div>'+bel.map(x=>'<div class="k">'+esc(x)+'</div>').join('')+'</div>'+
+  '<div class="mcard"><div class="lbl">Iluminação</div><div class="k">'+esc(ilum)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Antineurose</div><div class="k">'+esc(anti)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Mentalidade</div><div class="k">'+esc(ment)+'</div></div>'+
+  '<div class="mcard her"><div class="lbl">Imaginação heroica</div><div class="k">'+esc(her)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Aprendizado</div><div class="k">'+esc(apr)+'</div></div>'+
+  '<div class="mcard"><div class="lbl">Regra</div><div class="k">'+esc(regra)+'</div></div>'+
+  '<div class="backup"><button class="btn primary" onclick="marcaVisual()">'+(dd.visual==='min'?'Percorrido hoje':'Percorri o Manhã de hoje')+'</button><button class="btn" onclick="manOffset++;renderMan()">Outros</button><button class="btn" onclick="toggleFull()">Ver tudo e acrescentar</button></div>'+
+  '<div id="man-full" class="lista-full">'+renderManFull()+'</div>';
+ document.getElementById('painel-man').innerHTML=html;
+}
+function renderManFull(){
+ const blocos=[['afirm','Afirmações de manhã',AFIRMACOES],['moti','Moti (prefixe com o tipo e dois pontos, ex.: Luta: ...)',MOTI.map(m=>m.t+': '+m.k)],['necro','Necrológio',NECROLOGIO],['pai','Honra e memento mori',PAI],['sonhos','Sonhos e Imagine que',SONHOS],['sens','Sensações análogas',SENSACOES],['beleza','Ocupar a mente com coisa bonita',BELEZA],['ilum','Iluminações',ILUMINACOES],['emerg','Emergentismo e história',EMERGENTISMO],['anti','Antineurose',ANTINEUROSE],['beleza','Ocupar a mente com coisas bonitas',BELEZA],['heroica','Imaginação heroica',HEROICA],['ment','Mentalidade',MENTALIDADE],['apr','Aprendizados',APRENDIZADOS],['regras','Regras',REGRAS],['tarja','Aversivos com tarja (fora da rotação da manhã)',TARJA]];
+ const ex=loadExtra(); let h='';
+ for(const b of blocos){
+   const extra=(ex[b[0]]||[]);
+   h+='<div class="area"><h2>'+esc(b[1])+'</h2>'+b[2].map(x=>'<div class="k" style="font-size:13.5px;padding:4px 0;border-bottom:1px solid var(--line)">'+esc(typeof x==='string'?x:x.k)+'</div>').join('')+
+    extra.map((x,i)=>'<div class="k" style="font-size:13.5px;padding:4px 0;border-bottom:1px solid var(--line)">'+esc(typeof x==='string'?x:x.k)+' <button class="btn small" onclick="rmExtra(\''+b[0]+'\','+i+')">tirar</button></div>').join('')+
+    '<div class="add"><textarea id="add-'+b[0]+'" placeholder="Acrescentar item"></textarea><button class="btn small" onclick="addExtra(\''+b[0]+'\')">Acrescentar</button></div></div>';
+ }
+ return h;
+}
+function toggleFull(){document.getElementById('man-full').classList.toggle('show')}
+function addExtra(nome){
+ const ta=document.getElementById('add-'+nome); const v=(ta.value||'').trim(); if(!v)return;
+ const ex=loadExtra(); ex[nome]=ex[nome]||[];
+ if(nome==='moti'){const i=v.indexOf(':');ex[nome].push(i>0?{t:v.slice(0,i).trim(),k:v.slice(i+1).trim()}:{t:'Moti',k:v})}else ex[nome].push(v);
+ saveExtra(ex); renderMan(); document.getElementById('man-full').classList.add('show');
+}
+function rmExtra(nome,i){const ex=loadExtra();(ex[nome]||[]).splice(i,1);saveExtra(ex);renderMan();document.getElementById('man-full').classList.add('show')}
+function marcaVisual(){const h=fmt(new Date());const d=loadDia(h);d.visual='min';saveDia(h,d);renderMan()}
 
 /* ------- avisos ------- */
 function gerarAvisos(s,escopo,semanaIso){
@@ -619,12 +1662,7 @@ function gerarAvisos(s,escopo,semanaIso){
  else if(s.pctAb>=15)av.push(['red',s.pctAb+'% abaixo do mínimo. Vigiar antes que vire padrão.']);
  if(s.pctIdeal>=100){
    av.push(['gold','100% no ideal. Período masterizado.']);
-   if(escopo==='sem'&&semanaIso){
-     const s1=addDias(semanaIso,-7), s2=addDias(semanaIso,-14);
-     if(semanaCompleta(s1)&&semanaCompleta(s2)&&idealDaSemana(s1)>=100&&idealDaSemana(s2)>=100){
-       av.push(['gold','Três semanas seguidas com 100% de ideal. Você está indo muito bem: constância no nível máximo.']);
-     }
-   }
+   if(escopo==='sem'&&semanaIso){const s1=addDias(semanaIso,-7),s2=addDias(semanaIso,-14);if(semanaCompleta(s1)&&semanaCompleta(s2)&&idealDaSemana(s1)>=100&&idealDaSemana(s2)>=100)av.push(['gold','Três semanas seguidas com 100% de ideal. Constância no nível máximo.'])}
  }
  else if(s.pctIdeal>=80)av.push(['green','Muito bem: '+s.pctIdeal+'% no ideal. Quase masterizado.']);
  else if(s.pctPiso>=80)av.push(['green','Piso sustentado: '+s.pctPiso+'% dos itens no mínimo ou acima. Constância acima de intensidade.']);
@@ -637,174 +1675,119 @@ function avisosExame(e){
  if(e.feitos===0){av.push(['yellow','Nenhum exame registrado neste período ainda.']);return av}
  if(e.pctFeito>=100)av.push(['gold','Exame feito em todos os dias do período.']);
  else if(e.pctFeito<60)av.push(['yellow','Exame feito em '+e.pctFeito+'% dos dias. O exame só produz correção se for feito; comece pelo dia de hoje.']);
- if(e.reais>0){
-   if(e.pctFid>=90)av.push(['green','Fidelidade de '+e.pctFid+'% nas ocasiões reais.']);
-   else if(e.pctFid<60)av.push(['red','Fidelidade de '+e.pctFid+'% nas ocasiões reais. Um defeito-raiz de cada vez: pegue o item de maior recorrência abaixo e faça só dele o propósito.']);
- }
+ if(e.reais>0){if(e.pctFid>=90)av.push(['green','Fidelidade de '+e.pctFid+'% nas ocasiões reais.']);else if(e.pctFid<60)av.push(['red','Fidelidade de '+e.pctFid+'% nas ocasiões reais. Um defeito-raiz de cada vez: pegue o item de maior recorrência abaixo e faça só dele o propósito.'])}
  return av;
 }
 
 /* ------- insights ------- */
 function renderIns(){
- if(insModo==='sem')renderInsSem(); else if(insModo==='mes')renderInsMes(); else renderInsExa();
+ if(insModo==='sem')renderInsSem(); else if(insModo==='mes')renderInsMes(); else if(insModo==='ano')renderInsAno(); else renderInsExa();
+ renderCfg();
 }
+function cardsTop(s){return '<div class="row3"><div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+s.pctAb+'<small>%</small></div></div><div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+s.pctPiso+'<small>%</small></div></div><div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+s.pctIdeal+'<small>%</small></div></div></div>'}
 function renderInsSem(){
  document.getElementById('ilabel').textContent='Semana '+labelSem(insSem);
- const dias=[...Array(7)].map((_,i)=>addDias(insSem,i));
- const s=statsDias(dias);
- const hojeIso=fmt(new Date());
+ const dias=[...Array(7)].map((_,i)=>addDias(insSem,i)); const s=statsDias(dias); const hojeIso=fmt(new Date());
  const nomes=['S','T','Q','Q','S','S','D'];
- const chips=dias.map((d,i)=>{
-   if(d>hojeIso)return '<div class="chip"><div class="box" style="background:transparent"></div>'+nomes[i]+'</div>';
-   const p=pisoDoDia(d);
-   const cor=p>=100?'var(--ideal-c)':p>=60?'var(--min-bg)':p>0?'var(--abaixo-c)':'var(--paper)';
-   return '<div class="chip"><div class="box" style="background:'+cor+'"></div>'+nomes[i]+'<br>'+p+'%</div>';
- }).join('');
-
+ const chips=dias.map((d,i)=>{if(d>hojeIso)return '<div class="chip"><div class="box" style="background:transparent"></div>'+nomes[i]+'</div>';const p=pisoDoDia(d);const cor=p>=100?'var(--ideal-c)':p>=60?'var(--min-bg)':p>0?'var(--abaixo-c)':'var(--paper)';return '<div class="chip"><div class="box" style="background:'+cor+'"></div>'+nomes[i]+'<br>'+p+'%</div>'}).join('');
  let grade='';
- for(const m of DIARIAS){
-   const pm=s.porMetrica[m.id];
-   const cells=pm.dias.map(c=>'<div class="cell '+(c==='red'?'red':c==='yellow'?'yellow':c==='green'?'green':'')+'"></div>').join('');
-   grade+='<div class="gridrow"><div class="gname">'+m.n+'</div><div class="cells">'+cells+'</div></div>';
- }
-
- const ws=loadSem(insSem);
- let wHitMin=0,wTot=0,wLista='';
- for(const m of SEMANAIS){
-   const v=ws[m.id]||0;
-   const okMin=v>=m.min, okIdeal=m.ideal!=null&&v>=m.ideal;
-   if(m.min>0){wTot++;if(okMin)wHitMin++}
+ for(const m of diariasAtivas()){const pm=s.porMetrica[m.id];grade+='<div class="gridrow"><div class="gname">'+esc(m.n)+'</div><div class="cells">'+pm.dias.map(c=>'<div class="cell '+(c==='red'?'red':c==='yellow'?'yellow':c==='green'?'green':'')+'"></div>').join('')+'</div></div>'}
+ const hsm=SEMANAIS.find(m=>m.id==='hardskill');
+ const ws=hsSemana(insSem);
+ const wsd=loadSem(insSem); let wHitMin=0,wTot=0,wLista=''; const fechada=semanaCompleta(insSem);
+ for(const m of SEMANAIS){const v=wsd[m.id]||0;const okMin=v>=m.min,okIdeal=m.ideal!=null&&v>=m.ideal;if(m.min>0){wTot++;if(okMin)wHitMin++}
    let tag;
    if(okIdeal)tag='<span class="tag gold">ideal</span>';
    else if(okMin&&m.min>0)tag='<span class="tag ok">mín ok</span>';
    else if(m.min===0)tag='<span class="tag zero">'+v+'x</span>';
+   else if(!fechada)tag='<span class="tag zero">'+v+' de '+m.min+' · em curso</span>';
    else tag='<span class="tag miss">'+v+' de '+m.min+'</span>';
-   wLista+='<div class="wk-item"><span class="txt">'+m.n+'</span>'+tag+'</div>';
- }
+   wLista+='<div class="wk-item"><span class="txt">'+esc(m.n)+'</span>'+tag+'</div>'}
  const wPct=wTot?Math.round(wHitMin/wTot*100):0;
  const avisos=gerarAvisos(s,'sem',insSem).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
-
- document.getElementById('painel-ins').innerHTML=
-  avisos+
-  '<div class="row3">'+
-   '<div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+s.pctAb+'<small>%</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+s.pctPiso+'<small>%</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+s.pctIdeal+'<small>%</small></div></div>'+
-  '</div>'+
+ document.getElementById('painel-ins').innerHTML=avisos+cardsTop(s)+
   '<div class="insight-card"><div class="lbl">Dias da semana — % do piso</div><div class="daychips">'+chips+'</div></div>'+
-  '<div class="insight-card"><div class="lbl">Desempenho da semana — item a item</div>'+
-   '<div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span><span><div class="cell"></div>sem marca</span></div>'+
-   grade+'</div>'+
-  '<div class="insight-card"><div class="lbl">Semanais — pisos batidos</div><div class="big">'+wHitMin+'<small> de '+wTot+' ('+wPct+'%)</small></div><div style="color:var(--ink-2);font-size:12px;margin-top:4px">Semanais são preenchidas no domingo; antes disso este número fica incompleto.</div></div>'+
+  '<div class="insight-card"><div class="lbl">Desempenho da semana — item a item</div><div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span><span><div class="cell"></div>sem marca</span></div>'+grade+'</div>'+
+  '<div class="insight-card"><div class="lbl">Semanais — pisos batidos</div><div class="big">'+wHitMin+'<small> de '+wTot+' ('+wPct+'%)</small></div>'+(fechada?'':'<div style="color:var(--ink-2);font-size:12px;margin-top:6px">Semana em curso: o piso semanal só é cobrado no domingo à noite.</div>')+'</div>'+
   '<div class="insight-card"><div class="lbl">Detalhe semanal</div>'+wLista+'</div>'+
   '<div class="note">Falhar o alvo não é falhar. Falhar o piso pede correção amanhã, sem veredito.</div>';
 }
+function diasDoMes(iso){const d0=new Date(iso+'T12:00:00');const n=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate();return [...Array(n)].map((_,i)=>addDias(iso,i))}
+function segundasDoMes(iso,dias){const segs=[];let s1=segunda(new Date(iso+'T12:00:00'));if(s1<iso)s1=addDias(s1,7);for(let s2=s1;s2<=dias[dias.length-1];s2=addDias(s2,7))segs.push(s2);return segs}
 function renderInsMes(){
  document.getElementById('ilabel').textContent=labelMes(insMes);
- const d0=new Date(insMes+'T12:00:00');
- const nDias=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate();
- const dias=[...Array(nDias)].map((_,i)=>addDias(insMes,i));
- const s=statsDias(dias);
-
- let grade='';
- for(const m of DIARIAS){
-   const pm=s.porMetrica[m.id];
-   grade+='<div class="wk-item"><span class="txt">'+m.n+'</span><span style="display:flex;gap:6px">'+
-    '<span class="tag miss">'+pm.ab+'</span><span class="tag ok">'+pm.mi+'</span><span class="tag gold">'+pm.idl+'</span></span></div>';
- }
-
- const segundas=[];
- let seg1=segunda(new Date(insMes+'T12:00:00'));
- if(seg1<insMes)seg1=addDias(seg1,7);
- for(let s2=seg1;s2<=dias[nDias-1];s2=addDias(s2,7))segundas.push(s2);
- let wHit=0,wTot=0;
- for(const w of segundas){
-   const ws=loadSem(w);
-   for(const m of SEMANAIS){if(m.min>0){wTot++;if((ws[m.id]||0)>=m.min)wHit++}}
- }
+ const dias=diasDoMes(insMes); const s=statsDias(dias);
+ let grade='';for(const m of diariasAtivas()){const pm=s.porMetrica[m.id];grade+='<div class="wk-item"><span class="txt">'+esc(m.n)+'</span><span style="display:flex;gap:6px"><span class="tag miss">'+pm.ab+'</span><span class="tag ok">'+pm.mi+'</span><span class="tag gold">'+pm.idl+'</span></span></div>'}
+ const segs=segundasDoMes(insMes,dias); let wHit=0,wTot=0,hsTot=0; const hsm=SEMANAIS.find(m=>m.id==='hardskill');
+ for(const w of segs){const ws=loadSem(w);for(const m of SEMANAIS){if(m.tipo==='blocos')continue;if(m.min>0){wTot++;if((ws[m.id]||0)>=m.min)wHit++}}const h=hsSemana(w);hsTot+=h.soma;wTot++;if(h.soma>=hsm.min)wHit++}
  const wPct=wTot?Math.round(wHit/wTot*100):0;
  const avisos=gerarAvisos(s,'mes',null).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
-
- document.getElementById('painel-ins').innerHTML=
-  avisos+
-  '<div class="row3">'+
-   '<div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+s.pctAb+'<small>%</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+s.pctPiso+'<small>%</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+s.pctIdeal+'<small>%</small></div></div>'+
-  '</div>'+
-  '<div class="insight-card"><div class="lbl">Mês — item a item (abaixo · mínimo · ideal, em dias)</div>'+
-   '<div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span></div>'+
-   grade+'</div>'+
-  '<div class="insight-card"><div class="lbl">Semanais do mês — pisos batidos</div><div class="big">'+wHit+'<small> de '+wTot+' ('+wPct+'%)</small></div></div>'+
+ document.getElementById('painel-ins').innerHTML=avisos+cardsTop(s)+
+  '<div class="insight-card"><div class="lbl">Mês — item a item (abaixo · mínimo · ideal, em dias)</div><div class="legend"><span><div class="cell red"></div>abaixo</span><span><div class="cell yellow"></div>mínimo</span><span><div class="cell green"></div>ideal</span></div>'+grade+'</div>'+
+  '<div class="insight-card"><div class="lbl">Semanais do mês — pisos batidos</div><div class="big">'+wHit+'<small> de '+wTot+' ('+wPct+'%)</small></div><div style="color:var(--ink-2);font-size:12px;margin-top:4px">Blocos de hardskill no mês: '+hsTot+'</div></div>'+
   '<div class="note">Falhar o alvo não é falhar. Falhar o piso pede correção amanhã, sem veredito.</div>';
+}
+function renderInsAno(){
+ document.getElementById('ilabel').textContent='Ano '+insAno;
+ const hojeIso=fmt(new Date()); let linhas='',acAb=0,acMi=0,acIdl=0,acTot=0,acDias=0,hsAno=0; const hsm=SEMANAIS.find(m=>m.id==='hardskill');
+ const semanasAno=[];
+ for(let mi=0;mi<12;mi++){
+   const iso=fmt(new Date(insAno,mi,1)); if(iso>hojeIso)break;
+   const dias=diasDoMes(iso); const s=statsDias(dias);
+   acAb+=s.ab;acMi+=s.mi;acIdl+=s.idl;acTot+=s.tot;acDias+=s.diasContados;
+   let hsMes=0; for(const s2 of segundasDoMes(iso,dias)){if(s2>hojeIso)break;hsMes+=hsSemana(s2).soma}
+   hsAno+=hsMes;
+   linhas+='<div class="wk-item"><span class="txt">'+MESES[mi]+'<span class="cof-se">'+s.diasContados+' dias · '+hsMes+' blocos</span></span><span style="display:flex;gap:6px"><span class="tag miss">'+s.pctAb+'%</span><span class="tag ok">'+s.pctPiso+'%</span><span class="tag gold">'+s.pctIdeal+'%</span></span></div>';
+ }
+ for(let s=segunda(new Date(insAno,0,1));s<=segunda(new Date())&&s.slice(0,4)<=String(insAno);s=addDias(s,7)){if(s.slice(0,4)!==String(insAno)&&addDias(s,6).slice(0,4)!==String(insAno))continue;semanasAno.push([s,hsSemana(s).soma,pisoDaSemana(s)])}
+ const pctPiso=acTot?Math.round((acMi+acIdl)/acTot*100):0, pctIdeal=acTot?Math.round(acIdl/acTot*100):0, pctAb=acTot?Math.round(acAb/acTot*100):0;
+ const maxHs=Math.max(1,...semanasAno.map(x=>x[1]));
+ const barras=semanasAno.map(x=>'<div class="chip" style="min-width:0"><div class="box" style="height:34px;position:relative;background:var(--paper)"><div style="position:absolute;bottom:0;left:0;right:0;height:'+Math.round(x[1]/maxHs*100)+'%;background:'+(x[1]>=hsm.pisoSem?'var(--azul)':'var(--nh-c)')+'"></div></div></div>').join('');
+ const nomes=['seg','ter','qua','qui','sex','sáb','dom'];
+ document.getElementById('painel-ins').innerHTML=
+  '<div class="row3"><div class="insight-card"><div class="lbl">Abaixo</div><div class="big" style="color:var(--abaixo-c)">'+pctAb+'<small>%</small></div></div><div class="insight-card"><div class="lbl">Piso</div><div class="big" style="color:#8A6D0B">'+pctPiso+'<small>%</small></div></div><div class="insight-card"><div class="lbl">Ideal</div><div class="big" style="color:var(--ideal-c)">'+pctIdeal+'<small>%</small></div></div></div>'+
+  '<div class="insight-card"><div class="lbl">Acumulado do ano</div><div class="big">'+acDias+'<small> dias contados · '+hsAno+' blocos de hardskill</small></div></div>'+
+  '<div class="insight-card"><div class="lbl">Mês a mês (abaixo · piso · ideal)</div>'+(linhas||'<div style="color:var(--ink-2);font-size:13px">Sem meses neste ano ainda.</div>')+'</div>'+
+  '<div class="insight-card"><div class="lbl">Blocos de hardskill por semana — regularidade, não soma</div><div class="daychips" style="gap:2px">'+barras+'</div><div style="color:var(--ink-2);font-size:12px;margin-top:6px">Azul: semana no piso ('+hsm.pisoSem+'). Cinza: abaixo. '+semanasAno.length+' semanas.</div></div>'+
+  '<div class="note">Sem placar retroativo: o ano mostra tendência, não veredito.</div>';
 }
 function renderInsExa(){
  document.getElementById('ilabel').textContent='30 dias até '+labelCurto(insExa);
- const dias=[...Array(30)].map((_,i)=>addDias(insExa,-29+i));
- const e=statsExame(dias);
- const cof=statsCof(dias);
+ const dias=[...Array(30)].map((_,i)=>addDias(insExa,-29+i)); const e=statsExame(dias); const cof=statsCof(dias);
  const avisos=avisosExame(e).map(a=>'<div class="aviso '+a[0]+'">'+a[1]+'</div>').join('');
-
- let blocos='';
- for(const b in e.porBloco){
-   const x=e.porBloco[b], r=x.fiel+x.falta;
-   const p=r?Math.round(x.fiel/r*100):0;
-   const cls=!r?'zero':p>=90?'gold':p>=60?'ok':'miss';
-   blocos+='<div class="wk-item"><span class="txt">'+esc(b)+'</span><span class="tag '+cls+'">'+(r?p+'%':'—')+'</span></div>';
- }
-
- let grade='';
- for(const i of e.itens){
-   const p=e.por[i.id];
-   grade+='<div class="wk-item"><span class="txt">'+esc(i.q)+'</span><span style="display:flex;gap:6px">'+
-    '<span class="tag gold">'+p.fiel+'</span><span class="tag miss">'+p.falta+'</span><span class="tag nh">'+p.nh+'</span></span></div>';
- }
-
+ let blocos='';for(const b in e.porBloco){const x=e.porBloco[b],r=x.fiel+x.falta;const p=r?Math.round(x.fiel/r*100):0;const cls=!r?'zero':p>=90?'gold':p>=60?'ok':'miss';blocos+='<div class="wk-item"><span class="txt">'+esc(b)+'</span><span class="tag '+cls+'">'+(r?p+'%':'—')+'</span></div>'}
+ let grade='';for(const i of e.itens){const p=e.por[i.id];grade+='<div class="wk-item"><span class="txt">'+esc(i.q)+'</span><span style="display:flex;gap:6px"><span class="tag gold">'+p.fiel+'</span><span class="tag miss">'+p.falta+'</span><span class="tag nh">'+p.nh+'</span></span></div>'}
  const raiz=[...e.itens].map(i=>({q:i.q,n:e.por[i.id].falta})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,5);
- const raizHtml=raiz.length?raiz.map(x=>'<div class="wk-item"><span class="txt">'+esc(x.q)+'</span><span class="tag miss">'+x.n+'</span></div>').join('')
-   :'<div style="color:var(--ink-2);font-size:13px">Nenhuma falta registrada no período.</div>';
-
- let cofHtml='';
- COF_REGRAS.forEach((r,i)=>{
-   const p=cof[r.id];
-   const reais=p.cumpri+p.faltei;
-   const pct=reais?Math.round(p.cumpri/reais*100):null;
-   const imp=p.faltei?(' · L '+p.livre+' M '+p.misto+' C '+p.compelido):'';
-   cofHtml+='<div class="wk-item"><span class="txt"><span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+
-    '<span class="cof-se">'+p.faltei+' faltas · '+p.nh+' sem ocasião · '+p.cumpri+' cumpridas'+imp+'</span></span>'+
-    '<span class="tag '+(pct===null?'zero':pct>=90?'gold':pct>=60?'ok':'miss')+'">'+(pct===null?'—':pct+'%')+'</span></div>';
- });
-
- document.getElementById('painel-ins').innerHTML=
-  avisos+
-  '<div class="row3">'+
-   '<div class="insight-card"><div class="lbl">Exames feitos</div><div class="big">'+e.feitos+'<small> de '+e.contados+'</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Fidelidade</div><div class="big" style="color:var(--ideal-c)">'+e.pctFid+'<small>%</small></div></div>'+
-   '<div class="insight-card"><div class="lbl">Sem ocasião</div><div class="big" style="color:var(--nh-c)">'+e.nh+'</div></div>'+
-  '</div>'+
+ const raizHtml=raiz.length?raiz.map(x=>'<div class="wk-item"><span class="txt">'+esc(x.q)+'</span><span class="tag miss">'+x.n+'</span></div>').join(''):'<div style="color:var(--ink-2);font-size:13px">Nenhuma falta registrada no período.</div>';
+ const ds=[['c1','Sem pornografia'],['d1','Sem faltar ao dever'],['d5','Sem faltar à aula'],['d7','Sem jogo ou reels fora do intervalo'],['a1','Sem celular ao levantar']].map(x=>[x[1],diasSem(x[0],false)]).filter(x=>x[1]);
+ const dsHtml=ds.map(x=>'<div class="wk-item"><span class="txt">'+x[0]+'<span class="cof-se">'+x[1].desde+'</span></span><span class="tag gold">'+x[1].atual+' dias</span><span class="tag zero">recorde '+x[1].recorde+'</span></div>').join('');
+ let cofHtml='';COF_REGRAS.forEach((r,i)=>{const p=cof[r.id];const reais=p.cumpri+p.faltei;const pct=reais?Math.round(p.cumpri/reais*100):null;const imp='';cofHtml+='<div class="wk-item"><span class="txt"><span class="cof-num">'+(i+1)+'</span>'+esc(r.t)+'<span class="cof-se">'+p.faltei+' faltas · '+p.nh+' sem ocasião · '+p.cumpri+' cumpridas'+imp+'</span></span><span class="tag '+(pct===null?'zero':pct>=90?'gold':pct>=60?'ok':'miss')+'">'+(pct===null?'—':pct+'%')+'</span></div>'});
+ document.getElementById('painel-ins').innerHTML=avisos+
+  '<div class="row3"><div class="insight-card"><div class="lbl">Exames feitos</div><div class="big">'+e.feitos+'<small> de '+e.contados+'</small></div></div><div class="insight-card"><div class="lbl">Fidelidade</div><div class="big" style="color:var(--ideal-c)">'+e.pctFid+'<small>%</small></div></div><div class="insight-card"><div class="lbl">Sem ocasião</div><div class="big" style="color:var(--nh-c)">'+e.nh+'</div></div></div>'+
+  '<div class="insight-card"><div class="lbl">Dias sem — seguidos, contando dia sem resposta como falta</div>'+dsHtml+'<div style="color:var(--ink-2);font-size:12px;margin-top:6px">Uma falta, ou um dia passado sem responder o exame, zera o contador e guarda o recorde. Hoje ainda não respondido não conta nem quebra. Nunca falhe duas vezes: a retomada no dia seguinte é o que conta.</div></div>'+
   '<div class="insight-card"><div class="lbl">Fidelidade por bloco — fiel sobre ocasiões reais</div>'+blocos+'</div>'+
-  '<div class="insight-card"><div class="lbl">Defeitos-raiz — itens com mais faltas</div>'+
-   '<div style="color:var(--ink-2);font-size:12px;margin-bottom:6px">Um defeito-raiz de cada vez. Pegue o primeiro e faça só dele o propósito de amanhã.</div>'+
-   raizHtml+'</div>'+
-  '<div class="insight-card"><div class="lbl">Regras COF — '+esc(COF_ROTULO)+'</div>'+
-   '<div class="legend"><span><span class="tag gold">n</span>cumpri</span><span><span class="tag miss">n</span>faltei</span><span><span class="tag nh">n</span>sem ocasião</span></div>'+
-   '<div style="color:var(--ink-2);font-size:12px;margin:6px 0">L, M, C = falta livre, mista, compelida. O percentual é sobre as ocasiões reais, não sobre os 30 dias.</div>'+
-   cofHtml+'</div>'+
-  '<div class="insight-card"><div class="lbl">Exame — item a item (fiel · falta · sem ocasião, em dias)</div>'+
-   '<div class="legend"><span><span class="tag gold">n</span>fiel</span><span><span class="tag miss">n</span>falta</span><span><span class="tag nh">n</span>sem ocasião</span></div>'+
-   grade+'</div>'+
+  '<div class="insight-card"><div class="lbl">Defeitos-raiz — itens com mais faltas</div><div style="color:var(--ink-2);font-size:12px;margin-bottom:6px">Um defeito-raiz de cada vez. Pegue o primeiro e faça só dele o propósito de amanhã.</div>'+raizHtml+'</div>'+
+  '<div class="insight-card"><div class="lbl">Regras COF — '+esc(COF_ROTULO)+'</div><div class="legend"><span><span class="tag gold">n</span>cumpri</span><span><span class="tag miss">n</span>faltei</span><span><span class="tag nh">n</span>sem ocasião</span></div><div style="color:var(--ink-2);font-size:12px;margin:6px 0">O percentual é sobre as ocasiões reais, não sobre os 30 dias.</div>'+cofHtml+'</div>'+
+  '<div class="insight-card"><div class="lbl">Exame — item a item (fiel · falta · sem ocasião, em dias)</div><div class="legend"><span><span class="tag gold">n</span>fiel</span><span><span class="tag miss">n</span>falta</span><span><span class="tag nh">n</span>sem ocasião</span></div>'+grade+'</div>'+
   '<div class="note">Item não respondido não conta como falta. Exame em chave de contrição, não de autoflagelação.</div>';
 }
-function modo(m){
- insModo=m;
- document.getElementById('mb-sem').classList.toggle('on',m==='sem');
- document.getElementById('mb-mes').classList.toggle('on',m==='mes');
- document.getElementById('mb-exa').classList.toggle('on',m==='exa');
- renderIns();
+function renderCfg(){
+ const c=loadCfg();
+ document.getElementById('painel-cfg').innerHTML=
+  '<div class="insight-card"><div class="lbl">Ajustes</div>'+
+  '<div class="cfgrow"><span>Início da contagem dos objetivos</span><input type="date" value="'+(c.inicio||'')+'" onchange="cfgSet(\'inicio\',this.value)"></div>'+
+  '<div style="color:var(--ink-2);font-size:12px;margin-top:8px">Mudar esta data altera de quando o app soma a execução dos objetivos.</div></div>'+
+  (NATIVO?'<div class="insight-card"><div class="lbl">App Android</div>'+
+   '<div class="cfgrow"><span>Versão instalada: '+PainelNativo.versaoApp()+'</span><button class="btn" onclick="PainelNativo.checarAtualizacaoAgora()">Procurar atualização</button></div>'+
+   '<div class="cfgrow"><span>Acesso ao uso: '+(PainelNativo.temAcessoUso()?'ativado':'desativado')+'</span><button class="btn" onclick="PainelNativo.pedirAcessoUso()">Abrir ajuste</button></div>'+
+   '<div class="cfgrow"><span>Endereço: '+esc(PainelNativo.endereco())+'</span><button class="btn" onclick="PainelNativo.trocarEndereco()">Trocar</button></div></div>':'');
 }
+function cfgSet(k,v){const c=loadCfg();c[k]=v===''?null:v;saveCfg(c);renderIns()}
+function modo(m){insModo=m;['sem','mes','ano','exa'].forEach(x=>document.getElementById('mb-'+x).classList.toggle('on',m===x));renderIns()}
 function mudarIns(n){
  if(insModo==='sem')insSem=addDias(insSem,7*n);
  else if(insModo==='mes'){const d=new Date(insMes+'T12:00:00');d.setMonth(d.getMonth()+n);insMes=fmt(new Date(d.getFullYear(),d.getMonth(),1))}
+ else if(insModo==='ano')insAno+=n;
  else insExa=addDias(insExa,30*n);
  renderIns();
 }
@@ -812,43 +1795,41 @@ function mudarIns(n){
 /* ------- backup ------- */
 function exportar(){
  const dump={};
- for(let i=0;i<localStorage.length;i++){
-   const k=localStorage.key(i);
-   if(k&&k.startsWith(PREFIX))dump[k]=localStorage.getItem(k);
- }
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PREFIX))dump[k]=localStorage.getItem(k)}
+ if(NATIVO&&PainelNativo.salvarArquivo){PainelNativo.salvarArquivo('painel-metricas-backup-'+fmt(new Date())+'.json',JSON.stringify(dump,null,1));return}
  const blob=new Blob([JSON.stringify(dump,null,1)],{type:'application/json'});
- const a=document.createElement('a');
- a.href=URL.createObjectURL(blob);
- a.download='painel-metricas-backup-'+fmt(new Date())+'.json';
- a.click();
- URL.revokeObjectURL(a.href);
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='painel-metricas-backup-'+fmt(new Date())+'.json';a.click();URL.revokeObjectURL(a.href);
 }
 function importar(ev){
  const f=ev.target.files[0]; if(!f)return;
  if(!confirm('Importar sobrescreve os registros que tiverem a mesma data. Continuar?')){ev.target.value='';return}
  const r=new FileReader();
- r.onload=()=>{
-   try{
-     const dump=JSON.parse(r.result);
-     let n=0;
-     for(const k in dump){if(k.startsWith(PREFIX)){localStorage.setItem(k,dump[k]);n++}}
-     alert('Backup importado: '+n+' registros.');
-     renderDia();renderSem();renderExa();renderIns();
-   }catch(e){alert('Arquivo inválido.')}
- };
- r.readAsText(f);
- ev.target.value='';
+ r.onload=()=>{try{const dump=JSON.parse(r.result);let n=0;for(const k in dump){if(k.startsWith(PREFIX)){localStorage.setItem(k,dump[k]);n++}}alert('Backup importado: '+n+' registros.');renderDia();renderSem();renderExa();renderIns()}catch(e){alert('Arquivo inválido.')}};
+ r.readAsText(f); ev.target.value='';
 }
 
 /* ------- navegação ------- */
 function tab(t){
- for(const v of['dia','sem','exa','ins']){
-   document.getElementById('view-'+v).classList.toggle('hidden',v!==t);
-   document.getElementById('nb-'+v).classList.toggle('active',v===t);
- }
- if(t==='dia')renderDia(); if(t==='sem')renderSem(); if(t==='exa')renderExa(); if(t==='ins')renderIns();
+ for(const v of['tat','man','dia','sem','exa','obj','ins']){document.getElementById('view-'+v).classList.toggle('hidden',v!==t);document.getElementById('nb-'+v).classList.toggle('active',v===t)}
+ if(t==='tat')renderTat(); if(t==='man')renderMan(); if(t==='dia')renderDia(); if(t==='sem')renderSem(); if(t==='exa')renderExa(); if(t==='obj')renderObj(); if(t==='ins')renderIns();
 }
-renderDia();
+loadCfg();
+tab('tat');
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>{
+   navigator.serviceWorker.register('sw.js').then(reg=>{
+     reg.addEventListener('updatefound',()=>{
+       const nv=reg.installing;
+       if(!nv)return;
+       nv.addEventListener('statechange',()=>{
+         if(nv.state==='installed'&&navigator.serviceWorker.controller){
+           if(confirm('Há uma versão nova do painel. Recarregar agora? Seus registros não são afetados.'))location.reload();
+         }
+       });
+     });
+   }).catch(()=>{});
+ });
+}
 </script>
 </body>
 </html>
