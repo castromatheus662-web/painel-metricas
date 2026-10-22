@@ -2,7 +2,7 @@
    Estratégia: network-first para o index (pega versão nova quando há rede),
    cache-first para ícones e manifest. Nunca toca no localStorage: seus registros
    ficam no navegador, não neste cache. */
-const CACHE = 'painel-v71';
+const CACHE = 'painel-v72';
 const ARQUIVOS = [
   './',
   './index.html',
